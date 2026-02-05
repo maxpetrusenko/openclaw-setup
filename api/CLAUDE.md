@@ -7,6 +7,7 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #610 | 1:58 PM | 🔄 | Email workflow enhanced with error handling and HTML formatting | ~256 |
 | #606 | 1:41 PM | 🟣 | Email API endpoint implemented with Notion and Resend integration | ~395 |
 | #605 | " | 🔵 | Waitlist API serverless function implemented | ~336 |
 | #601 | 1:36 PM | ✅ | Email sender domain updated in waitlist API | ~174 |

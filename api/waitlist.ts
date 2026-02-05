@@ -60,29 +60,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Save to Notion
   if (NOTION_API_KEY) {
     try {
-      const notionRes = await fetch(NOTION_API, {
-        method: 'POST',
+      // First get the data_source_id from the database (new API 2025-09-03)
+      const dbRes = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}`, {
         headers: {
           'Authorization': `Bearer ${NOTION_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28',
+          'Notion-Version': '2025-09-03',
         },
-        body: JSON.stringify({
-          parent: { database_id: DATABASE_ID },
-          properties: {
-            Email: {
-              title: [{ text: { content: email } }],
-            },
-            'Signed Up': {
-              date: { start: new Date().toISOString() },
-            },
-          },
-        }),
       });
-      if (!notionRes.ok) {
-        const text = await notionRes.text();
-        console.error('Notion error:', text);
-        errors.push('Notion save failed');
+
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        // Get first data source ID
+        const dataSourceId = dbData.data_sources?.[0]?.id;
+
+        if (dataSourceId) {
+          // Create page with data_source_id as parent
+          const notionRes = await fetch(NOTION_API, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${NOTION_API_KEY}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2025-09-03',
+            },
+            body: JSON.stringify({
+              parent: { data_source_id: dataSourceId },
+              properties: {
+                Email: {
+                  title: [{ text: { content: email } }],
+                },
+              },
+            }),
+          });
+
+          if (!notionRes.ok) {
+            const text = await notionRes.text();
+            console.error('Notion error:', text);
+            errors.push('Notion save failed: ' + text);
+          }
+        } else {
+          console.error('No data source found in database');
+          errors.push('No data source in database');
+        }
+      } else {
+        const text = await dbRes.text();
+        console.error('Database fetch error:', text);
+        errors.push('Database fetch failed');
       }
     } catch (e) {
       console.error('Notion exception:', e);
