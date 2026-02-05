@@ -91,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'OpenClaw <noreply@openclaw.ai>',
+          from: 'OpenClaw <noreply@weblydev.com>',
           to: email,
           subject: 'Your OpenClaw Setup Guide',
           html: SETUP_GUIDE.replace(/\n/g, '<br>').replace(/```/g, '').replace(/`/g, ''),

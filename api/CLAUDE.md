@@ -7,6 +7,7 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #601 | 1:36 PM | ✅ | Email sender domain updated in waitlist API | ~174 |
 | #598 | 1:27 PM | 🟣 | Waitlist API endpoint implemented with Notion and Resend integration | ~369 |
 | #590 | 1:17 PM | 🟣 | Notion API integration for email capture implemented | ~247 |
 | #588 | " | 🔴 | Hardcoded Notion API key removed for security | ~201 |
