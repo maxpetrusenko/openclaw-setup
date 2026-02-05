@@ -6,45 +6,42 @@ const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 const SETUP_GUIDE = `
-# OpenClaw Setup Guide
+<h1>OpenClaw Setup Guide</h1>
 
-Welcome! Here's how to get OpenClaw running:
+<p>Welcome! Here's how to get OpenClaw running:</p>
 
-## 1. Prerequisites
-- Node.js 18+ installed
-- OpenAI API key (or Anthropic/other LLM provider)
-- Mac, Linux, or WSL on Windows
+<h2>1. Prerequisites</h2>
+<ul>
+  <li>Node.js 18+ installed</li>
+  <li>OpenAI API key (or Anthropic/other LLM provider)</li>
+  <li>Mac, Linux, or WSL on Windows</li>
+</ul>
 
-## 2. Install OpenClaw
-\`\`\`bash
-git clone https://github.com/steipete/OpenClaw.git
+<h2>2. Install OpenClaw</h2>
+<pre><code>git clone https://github.com/steipete/OpenClaw.git
 cd OpenClaw
-npm install
-\`\`\`
+npm install</code></pre>
 
-## 3. Configure
-Copy the example config and add your API keys:
-\`\`\`bash
-cp .env.example .env
-# Edit .env with your API keys
-\`\`\`
+<h2>3. Configure</h2>
+<p>Copy the example config and add your API keys:</p>
+<pre><code>cp .env.example .env
+# Edit .env with your API keys</code></pre>
 
-## 4. Run
-\`\`\`bash
-npm start
-\`\`\`
+<h2>4. Run</h2>
+<pre><code>npm start</code></pre>
 
-## 5. Connect Your Apps
-OpenClaw works with:
-- Gmail (for email automation)
-- Google Calendar (for scheduling)
-- Notion (for knowledge base)
-- WhatsApp & Telegram (for messaging)
+<h2>5. Connect Your Apps</h2>
+<p>OpenClaw works with:</p>
+<ul>
+  <li>Gmail (for email automation)</li>
+  <li>Google Calendar (for scheduling)</li>
+  <li>Notion (for knowledge base)</li>
+  <li>WhatsApp & Telegram (for messaging)</li>
+</ul>
 
-Follow the prompts to connect each service.
+<p>Follow the prompts to connect each service.</p>
 
-## Need Help?
-Reply to this email if you get stuck. We're here to help!
+<p><strong>Need Help?</strong> Reply to this email if you get stuck. We're here to help!</p>
 `;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -58,10 +55,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Invalid email' });
   }
 
-  try {
-    // 1. Save to Notion
-    if (NOTION_API_KEY) {
-      await fetch(NOTION_API, {
+  const errors: string[] = [];
+
+  // 1. Save to Notion
+  if (NOTION_API_KEY) {
+    try {
+      const notionRes = await fetch(NOTION_API, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${NOTION_API_KEY}`,
@@ -80,11 +79,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
         }),
       });
+      if (!notionRes.ok) {
+        const text = await notionRes.text();
+        console.error('Notion error:', text);
+        errors.push('Notion save failed');
+      }
+    } catch (e) {
+      console.error('Notion exception:', e);
+      errors.push('Notion exception');
     }
+  }
 
-    // 2. Send email via Resend
-    if (RESEND_API_KEY) {
-      await fetch('https://api.resend.com/emails', {
+  // 2. Send email via Resend
+  if (RESEND_API_KEY) {
+    try {
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${RESEND_API_KEY}`,
@@ -94,14 +103,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           from: 'OpenClaw <noreply@weblydev.com>',
           to: email,
           subject: 'Your OpenClaw Setup Guide',
-          html: SETUP_GUIDE.replace(/\n/g, '<br>').replace(/```/g, '').replace(/`/g, ''),
+          html: SETUP_GUIDE,
         }),
       });
+      if (!resendRes.ok) {
+        const text = await resendRes.text();
+        console.error('Resend error:', text);
+        errors.push('Email send failed: ' + text);
+      } else {
+        const data = await resendRes.json();
+        console.log('Resend success:', data);
+      }
+    } catch (e) {
+      console.error('Resend exception:', e);
+      errors.push('Email exception');
     }
-
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to process request' });
   }
+
+  if (errors.length > 0) {
+    return res.status(500).json({ error: errors.join(', ') });
+  }
+
+  return res.status(200).json({ success: true });
 }
