@@ -286,8 +286,8 @@
             </div>
 
             <div class="waitlist-section">
-                <h2>Join the Waitlist</h2>
-                <p>Be first to get OpenClaw. Early adopters get priority support and shape the roadmap.</p>
+                <h2>Get Help With Setup</h2>
+                <p>OpenClaw is powerful, but setup can be tricky. Enter your email and we'll send you a step-by-step install guide plus personal help if you need it.</p>
 
                 <form class="waitlist-form" id="waitlist-form">
                     <input
@@ -296,7 +296,7 @@
                         placeholder="your@email.com"
                         required
                     >
-                    <button type="submit">Join Waitlist</button>
+                    <button type="submit">Get Setup Guide</button>
                 </form>
                 <div class="status" id="status"></div>
             </div>
@@ -315,7 +315,7 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
 
-            status.textContent = 'Adding you to the waitlist...';
+            status.textContent = 'Sending setup guide...';
             status.className = 'status';
 
             try {
@@ -326,23 +326,23 @@
                 });
 
                 if (response.ok) {
-                    status.textContent = "You're on the list! We'll be in touch soon.";
+                    status.textContent = "Check your inbox! Setup guide is on the way.";
                     status.className = 'status success';
                     form.reset();
                 } else {
-                    throw new Error('Failed to join waitlist');
+                    throw new Error('Failed to send');
                 }
             } catch (err) {
                 // Fallback: store in localStorage for demo
-                const waitlist = JSON.parse(localStorage.getItem('waitlist') || '[]');
-                if (!waitlist.includes(email)) {
-                    waitlist.push(email);
-                    localStorage.setItem('waitlist', JSON.stringify(waitlist));
-                    status.textContent = "You're on the list! We'll be in touch soon.";
+                const list = JSON.parse(localStorage.getItem('setup_requests') || '[]');
+                if (!list.includes(email)) {
+                    list.push(email);
+                    localStorage.setItem('setup_requests', JSON.stringify(list));
+                    status.textContent = "Check your inbox! Setup guide is on the way.";
                     status.className = 'status success';
                     form.reset();
                 } else {
-                    status.textContent = 'You\'re already on the waitlist!';
+                    status.textContent = 'You already requested the guide!';
                     status.className = 'status success';
                 }
             }

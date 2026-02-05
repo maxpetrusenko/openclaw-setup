@@ -1,0 +1,8 @@
+{
+  "name": "openclaw-setup",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@vercel/node": "^4.0.0"
+  }
+}
