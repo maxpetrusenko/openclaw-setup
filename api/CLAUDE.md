@@ -7,7 +7,8 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #605 | 1:41 PM | 🔵 | Waitlist API serverless function implemented | ~336 |
+| #606 | 1:41 PM | 🟣 | Email API endpoint implemented with Notion and Resend integration | ~395 |
+| #605 | " | 🔵 | Waitlist API serverless function implemented | ~336 |
 | #601 | 1:36 PM | ✅ | Email sender domain updated in waitlist API | ~174 |
 | #598 | 1:27 PM | 🟣 | Waitlist API endpoint implemented with Notion and Resend integration | ~369 |
 | #590 | 1:17 PM | 🟣 | Notion API integration for email capture implemented | ~247 |
