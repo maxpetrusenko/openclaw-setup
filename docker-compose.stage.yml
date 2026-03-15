@@ -1,0 +1,37 @@
+services:
+  openclaw-stage:
+    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:v2026.3.13-1}
+    container_name: openclaw-stage-1
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      NODE_ENV: production
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ${OPENCLAW_STAGE_STATE_DIR}/.openclaw:/home/node/.openclaw
+    ports:
+      - "127.0.0.1:18790:18789"
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      [
+        "openclaw",
+        "gateway",
+        "--bind",
+        "loopback",
+        "--port",
+        "18789",
+      ]
+    healthcheck:
+      test: ["CMD", "openclaw", "health", "--json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
