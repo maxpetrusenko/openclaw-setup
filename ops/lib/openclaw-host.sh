@@ -13,5 +13,10 @@ readonly PROD_STATE_DIR="${OPENCLAW_PROD_STATE_DIR:-/docker/openclaw-ylld/data}"
 readonly STAGE_STATE_DIR="${OPENCLAW_STAGE_STATE_DIR:-/docker/openclaw-stage/data}"
 
 ssh_host() {
-  ssh -i "$KEY_PATH" -o StrictHostKeyChecking=accept-new "${USER_NAME}@${HOST}" "$@"
+  # Allow mock SSH for testing via OPENCLAW_SSH env var
+  if [[ -n "${OPENCLAW_SSH:-}" ]]; then
+    "$OPENCLAW_SSH" -i "$KEY_PATH" -o StrictHostKeyChecking=accept-new "${USER_NAME}@${HOST}" "$@"
+  else
+    command ssh -i "$KEY_PATH" -o StrictHostKeyChecking=accept-new "${USER_NAME}@${HOST}" "$@"
+  fi
 }
