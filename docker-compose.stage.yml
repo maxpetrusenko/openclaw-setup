@@ -1,6 +1,6 @@
 services:
   openclaw-stage:
-    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:v2026.3.13-1}
+    image: ${OPENCLAW_IMAGE:-ghcr.io/hostinger/hvps-openclaw:latest}
     container_name: openclaw-stage-1
     environment:
       HOME: /home/node

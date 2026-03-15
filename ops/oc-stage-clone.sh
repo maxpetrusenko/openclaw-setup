@@ -42,9 +42,9 @@ ssh_host "mkdir -p '${STAGE_STATE_DIR}'"
 echo "Cleaning existing staging state..."
 ssh_host "rm -rf '${STAGE_STATE_DIR}/.openclaw'"
 
-# Copy prod state to staging
+# Copy prod state to staging (exclude transient SQLite files)
 echo "Copying prod state to staging..."
-ssh_host "cp -a '${PROD_STATE_DIR}/.openclaw' '${STAGE_STATE_DIR}/.openclaw'"
+ssh_host "rsync -a --delete --exclude='*.db-shm' --exclude='*.db-wal' --exclude='*.sock' '${PROD_STATE_DIR}/.openclaw/' '${STAGE_STATE_DIR}/.openclaw/'"
 
 # Secure permissions
 echo "Securing staging state permissions..."

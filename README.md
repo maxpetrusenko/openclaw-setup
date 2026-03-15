@@ -1,33 +1,40 @@
-# OpenClaw
 
-The AI That Actually Does Things.
+This is file to tell hot to proceed further
 
-## Problem
+Look at .claude/CLAUDE.md and AGENTS.md in current folder and in ../agent-scripts
 
-- AI assistants are passive. They wait for you to prompt them.
-- Cloud AI means your data lives on someone else's servers.
-- You waste hours on repetitive digital tasks every week.
+Linux Hostinger -> ssh -i ~/.ssh/hostinger_agent ubuntu@187.77.7.226 "sudo docker exec -it openclaw-ylld-openclaw-1 sh"
+Easy login (laptop + AI) -> ./vps-openclaw.sh shell
+Open local dashboard tunnel -> ./vps-openclaw.sh tunnel
+Open local dashboard tunnel + browser -> ./vps-openclaw.sh tunnel --open
+Clawdbot workspace (skills/tools/memory) is synced locally in `clawdbot/` via `./vps-openclaw-workspace-sync.sh pull|push`
 
-## Solution
+## VPS Instances (Hostinger)
 
-OpenClaw is an open-source autonomous AI agent that:
-- **Takes action proactively** — no constant prompting needed
-- **Runs locally** — your data stays yours
-- **Integrates** with Gmail, Calendar, Notion, WhatsApp, Telegram
-- **Free forever** — open source, fully auditable
+- Max (public): container `openclaw-ylld-openclaw-1`, Hostinger proxy `57439` on `0.0.0.0`
+- Lera (Tailscale-only): container `openclaw-lera-openclaw-1`, URL `http://100.117.205.8:57440`
 
-## Landing Page
+Select instance with:
+- `OPENCLAW_CONTAINER=openclaw-lera-openclaw-1 ./vps-openclaw.sh shell|status|logs`
+- `OPENCLAW_CONTAINER=openclaw-lera-openclaw-1 ./vps-openclaw-workspace-sync.sh pull|push`
 
-Open `index.html` in a browser to view the landing page with waitlist signup.
+## Linear (ONLY supported flow)
 
-## Deploy
+- No Linear CLI is installed (`lin` / `linear` binaries are expected to be missing).
+- Use the Clawdbot Linear skill script:
+  - `clawdbot/skills/linear/scripts/linear.sh teams`
+  - `clawdbot/skills/linear/scripts/linear.sh create MAX "Title" "Description"`
+- Auth is via `LINEAR_API_KEY` in `.env` (do not hardcode tokens into repo files).
 
-Any static hosting works:
-- GitHub Pages
-- Netlify
-- Vercel
-- Cloudflare Pages
+## Project Context Packs
 
-For waitlist backend, connect to:
-- Vercel Blob / R2 for storage
-- Or use a service like Buttondown / ConvertKit
+- SouthFloridaQigong context pack (docs + image manifest) lives at:
+  - `clawdbot/business/southfloridaqigong/`
+
+## Bot creds:
+
+### Github
+    email:  openclaw@maxpetrusenko.com
+ (store in password manager)
+    git_un: openclawb0t
+    gh_ssh_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPvMqtBwd3kkpKbVola3ILSQtgXDhhGCbiPOB7M+pqRx openclawb0t

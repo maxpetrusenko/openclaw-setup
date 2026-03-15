@@ -26,7 +26,7 @@ scp -i "$KEY_PATH" -o StrictHostKeyChecking=accept-new \
 
 # Start staging container
 ssh_host "
-  export OPENCLAW_IMAGE='${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:v2026.3.13-1}'
+  export OPENCLAW_IMAGE='${OPENCLAW_IMAGE:-ghcr.io/hostinger/hvps-openclaw:latest}'
   export OPENCLAW_STAGE_STATE_DIR='${STAGE_STATE_DIR}'
   export OPENCLAW_GATEWAY_TOKEN='${OPENCLAW_GATEWAY_TOKEN:-}'
   export CLAUDE_AI_SESSION_KEY='${CLAUDE_AI_SESSION_KEY:-}'

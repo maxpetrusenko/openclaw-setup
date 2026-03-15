@@ -1,0 +1,4 @@
+repo_path: /Users/maxpetrusenko/Desktop/Projects/Oleksandr Popov/southfloridaqigong
+git_head: 465b01ebeee5554b83569e68d0f29d1de1c4ea02
+git_branch: main
+captured_at: 2026-02-15T13:40:33Z

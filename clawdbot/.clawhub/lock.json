@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "skills": {
+    "calendar": {
+      "version": "1.0.0",
+      "installedAt": 1770830717860
+    },
+    "search-1": {
+      "version": "1.0.1",
+      "installedAt": 1770830733637
+    },
+    "todo": {
+      "version": "1.1.0",
+      "installedAt": 1770830737304
+    },
+    "code": {
+      "version": "1.1.0",
+      "installedAt": 1770830740780
+    },
+    "planning-with-files": {
+      "version": "1.2.0",
+      "installedAt": 1770830744800
+    },
+    "base-trader": {
+      "version": "1.1.1",
+      "installedAt": 1770830749037
+    },
+    "smart-home-energy-saver": {
+      "version": "1.0.0",
+      "installedAt": 1770830753231
+    },
+    "imsg": {
+      "version": "1.0.0",
+      "installedAt": 1770830759580
+    },
+    "coordinate-meeting": {
+      "version": "1.0.1",
+      "installedAt": 1770830764595
+    },
+    "literature-search": {
+      "version": "1.0.3",
+      "installedAt": 1770830772094
+    },
+    "homeassistant-assist": {
+      "version": "1.1.0",
+      "installedAt": 1770830776323
+    },
+    "web-search-exa": {
+      "version": "1.0.1",
+      "installedAt": 1770830780494
+    },
+    "agentic-calling": {
+      "version": "0.1.0",
+      "installedAt": 1770830785114
+    },
+    "web-search": {
+      "version": "1.0.0",
+      "installedAt": 1770842651179
+    },
+    "gog": {
+      "version": "1.0.0",
+      "installedAt": 1770842566569
+    },
+    "healthcheck": {
+      "version": "1.0.2",
+      "installedAt": 1770842583349
+    },
+    "session-logs": {
+      "version": "1.0.0",
+      "installedAt": 1770842589099
+    },
+    "summarize": {
+      "version": "1.0.0",
+      "installedAt": 1770842607920
+    },
+    "weather": {
+      "version": "1.0.0",
+      "installedAt": 1770842616449
+    },
+    "weathercli": {
+      "version": "0.1.0",
+      "installedAt": 1770842617874
+    },
+    "github": {
+      "version": "1.0.0",
+      "installedAt": 1770842638130
+    },
+    "read-github": {
+      "version": "1.0.1",
+      "installedAt": 1770842640990
+    },
+    "tmux": {
+      "version": "1.0.0",
+      "installedAt": 1770842657505
+    },
+    "newsletter-digest": {
+      "version": "1.0.0",
+      "installedAt": 1770842665070
+    },
+    "youtube-watcher": {
+      "version": "1.0.0",
+      "installedAt": 1770842666445
+    },
+    "log-tail": {
+      "version": "1.0.0",
+      "installedAt": 1770842684203
+    },
+    "browser-use-api": {
+      "version": "1.0.1",
+      "installedAt": 1770842734005
+    },
+    "file-search": {
+      "version": "1.0.0",
+      "installedAt": 1770842763293
+    },
+    "agent-relay-digest": {
+      "version": "0.1.0",
+      "installedAt": 1770842805658
+    },
+    "longevity-assistant": {
+      "version": "1.0.0",
+      "installedAt": 1770842813655
+    },
+    "newsletter-generator": {
+      "version": "1.0.0",
+      "installedAt": 1770842822352
+    },
+    "linear": {
+      "version": "1.0.0",
+      "installedAt": 1771161520989
+    }
+  }
+}
