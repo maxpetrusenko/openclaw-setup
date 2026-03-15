@@ -49,7 +49,14 @@ if echo "$cmd" | grep -q "rm -rf.*/data/.openclaw"; then
   exit 0
 fi
 
-# Copy prod state to stage
+# Copy prod state to stage (rsync or cp)
+if echo "$cmd" | grep -q "rsync -a.*--exclude.*/data/.openclaw/.*/data/.openclaw"; then
+  mkdir -p "$STATE_PATH/stage/data/.openclaw"
+  rsync -a --exclude='*.db-shm' --exclude='*.db-wal' --exclude='*.sock' "$STATE_PATH/prod/data/.openclaw/" "$STATE_PATH/stage/data/.openclaw/"
+  exit 0
+fi
+
+# Legacy cp -a support
 if echo "$cmd" | grep -q "cp -a.*/data/.openclaw.*/data/.openclaw"; then
   cp -a "$STATE_PATH/prod/data/.openclaw" "$STATE_PATH/stage/data/.openclaw"
   exit 0
