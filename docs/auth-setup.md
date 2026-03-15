@@ -1,5 +1,9 @@
 # OpenClaw Auth Setup Guide
 
+## Operating Model Context
+
+Auth is managed on the Hostinger prod runtime. Local OpenClaw runtime is optional. Use `ops/vps-deploy.sh` commands to manage auth remotely via SSH.
+
 ## Goal
 
 Move provider auth out of `.env` and into OpenClaw-managed auth storage.

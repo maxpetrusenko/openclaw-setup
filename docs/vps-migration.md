@@ -1,5 +1,15 @@
 # OpenClaw VPS Migration Guide
 
+## Operating Model
+
+**Hostinger prod is the only live runtime.**
+
+- Local OpenClaw runtime is optional
+- Local source-update work in repo root `.`
+- Staging created by copying prod state
+- Plugin/config experiments in staging first
+- Rollback: previous image tag + untouched prod state
+
 From: **6/10 current setup** -> **8/10 safer deployment**
 
 ## Problem Summary
@@ -146,6 +156,42 @@ Old plugin errors remain:
 ./scripts/config-cleanup.sh
 ./ops/vps-deploy.sh doctor
 ```
+
+## Observability
+
+Prod snapshot:
+
+```bash
+./ops/oc-snapshot.sh
+```
+
+Daily report:
+
+```bash
+./ops/oc-daily-report.sh
+find reports/openclaw-daily -maxdepth 3 -type f | sort
+```
+
+## Staging Workflow
+
+Staging is a disposable clone for plugin/config experiments:
+
+```bash
+# Clone prod state to staging
+./ops/oc-stage-clone.sh
+
+# Bring staging up (127.0.0.1:18790)
+./ops/oc-stage-up.sh
+
+# Verify staging health
+./ops/oc-stage-smoke.sh
+
+# Destroy staging when done
+./ops/oc-stage-down.sh       # Keep state
+./ops/oc-stage-down.sh --purge  # Delete state
+```
+
+Prod remains untouched during staging lifecycle.
 
 ## Rating Change
 

@@ -1,5 +1,20 @@
 # OpenClaw VPS Quickstart
 
+## Operating Model
+
+**Hostinger prod is the only live runtime.**
+
+Local OpenClaw runtime is optional and not required. Local source-update work happens in repo root `.` before any prod deploy. Staging is created by copying prod state for plugin/config experiments.
+
+### Operating Lanes
+
+| Lane | Purpose | Location |
+|------|---------|----------|
+| **Local source-update** | OpenClaw edits, tests, plans | Repo root `.` |
+| **Hostinger prod** | Only live OpenClaw runtime | VPS container |
+| **Hostinger staging** | Disposable clone for experiments | Isolated loopback port |
+| **Daily report** | CTO-style summary from prod | `reports/openclaw-daily/` |
+
 ## First-Time Flow
 
 ```bash
@@ -68,6 +83,49 @@ openssl rand -base64 24  # paste into OPENCLAW_GATEWAY_TOKEN
 | `ops/vps-deploy.sh` | Deploy/orchestration |
 | `scripts/config-cleanup.sh` | Config repair |
 | `docs/vps-migration.md` | Full migration guide |
+
+## Observability
+
+Prod snapshot (default view):
+
+```bash
+./ops/oc-snapshot.sh
+```
+
+Daily CTO-style report:
+
+```bash
+./ops/oc-daily-report.sh
+```
+
+Reports live under `reports/openclaw-daily/YYYY-MM-DD/`.
+
+## Staging Workflow
+
+Create staging clone from prod state:
+
+```bash
+./ops/oc-stage-clone.sh
+```
+
+Bring staging up (isolated loopback port 127.0.0.1:18790):
+
+```bash
+./ops/oc-stage-up.sh
+```
+
+Smoke test staging:
+
+```bash
+./ops/oc-stage-smoke.sh
+```
+
+Destroy staging (prod untouched):
+
+```bash
+./ops/oc-stage-down.sh          # Keep state for re-clone
+./ops/oc-stage-down.sh --purge  # Delete staging state
+```
 
 ## Environment Variables
 
