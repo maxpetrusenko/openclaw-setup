@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software Factory — Mermaid Diagram</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0D1117;color:#C9D1D9;font-family:'Segoe UI',system-ui,sans-serif;padding:24px;min-height:100vh}
+  h1{text-align:center;font-size:1.6rem;color:#58A6FF;margin-bottom:6px;font-weight:600}
+  .sub{text-align:center;color:#8B949E;font-size:.85rem;margin-bottom:20px}
+  .tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .tab{padding:7px 16px;border-radius:20px;border:1px solid #30363D;background:#161B22;color:#8B949E;cursor:pointer;font-size:.8rem;transition:all .2s}
+  .tab:hover{border-color:#58A6FF;color:#C9D1D9}
+  .tab.on{background:#1F6FEB;border-color:#1F6FEB;color:#fff}
+  .diagram-wrap{background:#161B22;border:1px solid #30363D;border-radius:12px;padding:24px;overflow-x:auto}
+  .diagram-wrap svg{max-width:100%}
+  .mermaid{display:flex;justify-content:center}
+  .legend{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:16px}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:#8B949E}
+  .legend-dot{width:10px;height:10px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<h1>Software Factory — Architecture Flow</h1>
+<p class="sub">Athena Orchestrator · 3 Pipelines · 7 Phases · Self-Healing Loops</p>
+
+<div class="tabs">
+  <button class="tab on" onclick="show('overview')">Overview</button>
+  <button class="tab" onclick="show('phases')">Build Phases</button>
+  <button class="tab" onclick="show('selfheal')">Self-Healing Loop</button>
+  <button class="tab" onclick="show('agents')">Agent Map</button>
+</div>
+
+<div class="diagram-wrap">
+
+  <!-- OVERVIEW: 3 Athena instances, each owns its pipeline -->
+  <div id="d-overview" class="mermaid">
+flowchart TD
+    UI["🖥 UI\nProjects · Status · App Preview"]:::ui --> ATH_B["⚙️ Athena-Build\nInstinct8 · Lossless Claw"]:::orch
+    UI --> ATH_I["⚙️ Athena-Ideation\nInstinct8 · Lossless Claw"]:::orch
+    UI --> ATH_M["⚙️ Athena-Marketing\nInstinct8 · Lossless Claw"]:::orch
+
+    ATH_I --> IA["Ideation Agents\nGummy Search · Trend Scoring"]:::agents
+    IA -- "opportunity briefs" --> SHARED["/shared/\nHuman-curated handoff"]:::shared
+
+    ATH_B --> PL["📋 Project Lead\nBMAD Framework"]:::lead
+    SHARED -- "human copies\nuseful items" --> PL
+    PL --> BA["Building Agents\nbob · sally · winston · john\namelia · phil · murat"]:::agents
+
+    ATH_M --> MA["Marketing Agents\nClaude Ext + Comet Browser\nPlanner · Verifier Loop"]:::agents
+
+    BA --> OC["OpenClaw Runtime\nACP Protocol · 24/7 Daemon"]:::runtime
+    OC --> ART["📦 Artifacts\nPR · Build · Screenshots"]:::output
+
+    %% Gate / Approval goes to PM (not Athena)
+    BA -- "score &lt; 7 twice\nescalate" --> PL
+    PL -- "10 iters no progress\nescalate" --> ATH_B
+    ATH_B -- "re-decompose\nor redirect" --> PL
+
+    %% Learning feeds back to both agents AND PM
+    ART -- "learning captured" --> LEARN["📚 Learning Stage\nJournals · Tests\nConvention Updates"]:::learn
+    LEARN -- "future agents\ninherit learning" --> BA
+    LEARN -- "PM updates\nframework decisions" --> PL
+
+    classDef ui fill:#1F6FEB,stroke:#58A6FF,color:#fff
+    classDef orch fill:#7C3AED,stroke:#A78BFA,color:#fff
+    classDef lead fill:#2563EB,stroke:#60A5FA,color:#fff
+    classDef idea fill:#F59E0B,stroke:#FBBF24,color:#000
+    classDef build fill:#10B981,stroke:#34D399,color:#000
+    classDef market fill:#EC4899,stroke:#F472B6,color:#000
+    classDef agents fill:#1C2333,stroke:#30363D,color:#C9D1D9
+    classDef runtime fill:#DC2626,stroke:#F87171,color:#fff
+    classDef output fill:#0D9488,stroke:#2DD4BF,color:#fff
+    classDef learn fill:#D97706,stroke:#FBBF24,color:#fff
+    classDef shared fill:#6366F1,stroke:#818CF8,color:#fff
+  </div>
+
+  <!-- PHASES: Scaffold through In Review with fail-back loops -->
+  <div id="d-phases" class="mermaid" style="display:none">
+flowchart LR
+    P0["Phase 0\n**SCAFFOLD**\n─────\nbob · phil · amelia\nNx · BMAD · LangGraph"]:::scaffold --> P1["Phase 1\n**PLAN**\n─────\nPM · sally · winston\njohn · bob\nSpec Kit · OpenSpec"]:::plan
+
+    P1 --> P2["Phase 2\n**BUILD**\n─────\namelia\nClaude Code\ncopy audit"]:::build
+
+    P2 --> P3["Phase 3\n**TEST**\n─────\namelia · murat\nCI · Jest\nsecurity scan"]:::test
+
+    P3 --> P4["Phase 4\n**RELEASE PREP**\n─────\nphil · john\nFastlane · ASC\ndevice farm"]:::release
+
+    P4 --> P5["Phase 5\n**PRE-SHIP**\n─────\nphil\npipeline check\nfinal gate"]:::ship
+
+    P5 --> P6["Phase 6\n**IN REVIEW**\n─────\nphil · john · bob\nASC · submit\nphased release"]:::review
+
+    P6 --> LEARN["📚 LEARNING\n─────\nAll agents record\nConventions · Tests\nCross-agent propagation"]:::learn
+
+    %% Fail-back loops
+    P3 -- "CI fail → loop\n2-3 iterations" --> P2
+    P4 -- "QA checklist fail" --> P3
+    P5 -- "pipeline not green" --> P4
+    P6 -- "rejection" --> P4
+
+    %% Escalation
+    P3 -- "10 iters → escalate\nto PM → Athena" --> P1
+
+    classDef scaffold fill:#6366F1,stroke:#818CF8,color:#fff
+    classDef plan fill:#2563EB,stroke:#60A5FA,color:#fff
+    classDef build fill:#10B981,stroke:#34D399,color:#000
+    classDef test fill:#F59E0B,stroke:#FBBF24,color:#000
+    classDef release fill:#EC4899,stroke:#F472B6,color:#000
+    classDef ship fill:#DC2626,stroke:#F87171,color:#fff
+    classDef review fill:#0D9488,stroke:#2DD4BF,color:#fff
+    classDef learn fill:#D97706,stroke:#FBBF24,color:#fff
+  </div>
+
+  <!-- SELF-HEALING: The full Ralph loop with decision routing -->
+  <div id="d-selfheal" class="mermaid" style="display:none">
+flowchart TD
+    TICKET["📋 Ticket Assigned\nby PM"]:::start --> EX["1. EXECUTE\nAgent works ticket\nskills.md · convention map\nlossless-claw context"]:::step
+
+    EX --> SE["2. SELF-EVAL\nAgent scores 1–10\nLogs reasoning"]:::step
+
+    SE -- "score ≥ 8" --> CI["3. CI / CD\nDocker: lint · typecheck\nunit · integration tests"]:::step
+    SE -- "score &lt; 8\nimmediate re-loop" --> EX
+
+    CI -- "✅ pass" --> QA["4. QA BATCH REVIEW\nCollect ALL issues\nInstinct8 scoring\ngoal coherence · constraint recall"]:::qa
+    CI -- "❌ fail\nerror context injected" --> EX
+
+    QA -- "issues found\nbatch report" --> FIX["5. ENGINEER ITERATES\nFix ALL issues at once\nNot one-at-a-time"]:::step
+    FIX --> SE
+
+    QA -- "✅ clean\nscore ≥ 9" --> PM["6. PM DECISION\n9/10 → ship\n10/10 → one more round"]:::decision
+
+    PM -- "✅ ship" --> DONE["✅ DONE\nDraft PR · Annotations"]:::done
+    PM -- "demand 10/10" --> EX
+
+    DONE --> LEARN["📚 LEARNING STAGE\n─────\nEngineer records conventions\nQA records review patterns\nPM records framework decisions\n→ Tests for future agents"]:::learn
+    LEARN -- "agents inherit" --> EX
+    LEARN -- "PM updates" --> PM
+
+    %% Drift detection path
+    SE -- "score &lt; 7\ntwo consecutive" --> DRIFT["⚠️ DRIFT DETECTED"]:::warn
+    DRIFT --> REPAIR["🔧 REPAIR AGENT\nPatch context\nRe-align with plan\nMay kill / respawn"]:::repair
+    REPAIR --> EX
+
+    %% Escalation path up the chain
+    REPAIR -- "repair fails\n3 attempts" --> PM_ESC["🔼 ESCALATE TO PM\nRe-decompose ticket\nChange approach"]:::escalate
+    PM_ESC --> EX
+
+    PM_ESC -- "PM can't resolve\n10 total iterations" --> ATH_ESC["🔼 ESCALATE TO ATHENA\nHuman input requested\nRe-scope or redirect"]:::escalate
+    ATH_ESC -- "new direction" --> TICKET
+
+    classDef start fill:#6366F1,stroke:#818CF8,color:#fff
+    classDef step fill:#1C2333,stroke:#58A6FF,color:#C9D1D9
+    classDef qa fill:#10B981,stroke:#34D399,color:#000
+    classDef decision fill:#F59E0B,stroke:#FBBF24,color:#000
+    classDef done fill:#0D9488,stroke:#2DD4BF,color:#fff
+    classDef warn fill:#DC2626,stroke:#F87171,color:#fff
+    classDef repair fill:#7C3AED,stroke:#A78BFA,color:#fff
+    classDef escalate fill:#BE185D,stroke:#F472B6,color:#fff
+    classDef learn fill:#D97706,stroke:#FBBF24,color:#fff
+  </div>
+
+  <!-- AGENT MAP -->
+  <div id="d-agents" class="mermaid" style="display:none">
+flowchart TD
+    K["⚙️ Athena Orchestrator\nInstinct8 · Lossless Claw"]:::orch --> PL["📋 Project Lead / BMAD"]:::lead
+
+    PL --> BOB["🛠 bob\nScaffold · Sprint Planning\nStory Files · Dep Graph\nPost-Ship Cleanup"]:::agent
+    PL --> SALLY["🎨 sally\nUI Design · Figma\nFlows → Components"]:::agent
+    PL --> WINSTON["🏗 winston\nArchitect · OpenSpec\nContracts · System Design"]:::agent
+    PL --> JOHN["📝 john\nEpics · Stories · QA Checklist\nReadiness Check · Metadata"]:::agent
+    PL --> AMELIA["💻 amelia\nEngineer · Claude Code\nBuild · Test · Copy Audit"]:::agent
+    PL --> PHIL["🚀 phil\nCI/CD · Fastlane · ASC\nRelease · Compliance"]:::agent
+    PL --> MURAT["🔒 murat\nSecurity · NFT Scan\nBMAD Agent"]:::agent
+
+    AMELIA --> RL["Ralph Loop\nSelf-Eval → CI → QA"]:::loop
+    PHIL --> RL
+    BOB --> RL
+
+    RL --> QA["QA Gate\nBatch Review · Instinct8"]:::gate
+
+    QA -- "batch feedback" --> AMELIA
+    QA -- "≥ 9/10" --> PM_GATE["PM Decision Gate"]:::decision
+    PM_GATE -- "ship" --> LEARN["📚 Learning\nConventions · Tests"]:::learn
+    PM_GATE -- "demand 10" --> RL
+    LEARN -- "agents inherit" --> AMELIA
+    LEARN -- "PM updates" --> PL
+
+    QA -- "score &lt; 7 twice" --> REPAIR["🔧 Repair Agent\nDrift Correction"]:::repair
+    REPAIR --> RL
+    REPAIR -- "fails" --> PL
+
+    classDef orch fill:#7C3AED,stroke:#A78BFA,color:#fff
+    classDef lead fill:#2563EB,stroke:#60A5FA,color:#fff
+    classDef agent fill:#1C2333,stroke:#58A6FF,color:#C9D1D9
+    classDef loop fill:#F59E0B,stroke:#FBBF24,color:#000
+    classDef gate fill:#10B981,stroke:#34D399,color:#000
+    classDef decision fill:#F59E0B,stroke:#FBBF24,color:#000
+    classDef learn fill:#D97706,stroke:#FBBF24,color:#fff
+    classDef repair fill:#DC2626,stroke:#F87171,color:#fff
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>Athena / Orchestrator</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>Leadership</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Build / QA</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>Loop / Decision</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#DC2626"></div>Repair / Warning</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Learning</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#BE185D"></div>Escalation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>Context</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0D9488"></div>Output</div>
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#1C2333',
+    primaryTextColor: '#C9D1D9',
+    primaryBorderColor: '#30363D',
+    lineColor: '#58A6FF',
+    secondaryColor: '#161B22',
+    tertiaryColor: '#0D1117',
+    fontFamily: 'Segoe UI, system-ui, sans-serif',
+    fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 12 }
+});
+
+const views = ['overview','phases','selfheal','agents'];
+
+async function show(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('on', views[i] === id));
+  for (const v of views) {
+    const el = document.getElementById('d-' + v);
+    if (v === id) {
+      el.style.display = '';
+      if (!el.dataset.rendered) {
+        el.dataset.rendered = '1';
+        await mermaid.run({ nodes: [el] });
+      }
+    } else {
+      el.style.display = 'none';
+    }
+  }
+}
+
+(async () => {
+  const el = document.getElementById('d-overview');
+  el.dataset.rendered = '1';
+  await mermaid.run({ nodes: [el] });
+})();
+</script>
+</body>
+</html>

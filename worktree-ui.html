@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software Factory — Worktree + Plan</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,monospace;background:#0d1117;color:#c9d1d9;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.hdr{padding:10px 16px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:10px;background:#161b22;flex-shrink:0}
+.hdr h1{font-size:13px;font-weight:700;color:#f0f6fc}
+.tabs{display:flex;gap:3px}
+.tab{padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid transparent;background:0;color:#8b949e;font-family:inherit}
+.tab:hover{background:#21262d;color:#c9d1d9}
+.tab.on{background:#1f6feb22;color:#58a6ff;border-color:#1f6feb44}
+.sbar{margin-left:auto;font-size:11px;color:#8b949e;display:flex;gap:12px}
+.sd{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
+.sd-g{background:#3fb950}.sd-y{background:#d29922}.sd-r{background:#f85149}
+
+/* LAYOUT */
+.wrap{display:flex;flex:1;overflow:hidden}
+.pnl{flex:1;overflow-y:auto;padding:10px 14px;min-width:0}
+.pnl-l{border-right:1px solid #21262d;flex:1.2}
+.pnl-m{border-right:1px solid #21262d;flex:1}
+.pnl-r{flex:1}
+.app-frame{background:#1a1a2e;border:1px solid #30363d;border-radius:8px;overflow:hidden;margin-bottom:10px}
+.app-bar{background:#161b22;padding:6px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #21262d}
+.app-dot{width:7px;height:7px;border-radius:50%}
+.app-url{flex:1;background:#0d1117;border:1px solid #21262d;border-radius:4px;padding:2px 8px;font-size:9px;color:#6e7681;font-family:monospace}
+.app-body{padding:12px}
+.app-title{font-size:14px;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.app-card{background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
+.app-card:hover{border-color:#58a6ff;background:#161b22}
+.app-card.selected{border-color:#58a6ff;background:#1f6feb11}
+.app-card-ic{font-size:16px}
+.app-card-info{flex:1}
+.app-card-name{font-size:11px;color:#f0f6fc;font-weight:600}
+.app-card-sub{font-size:9px;color:#6e7681}
+.app-card-arrow{color:#484f58;font-size:12px}
+.app-add-btn{background:#1f6feb11;border:1px dashed #1f6feb44;border-radius:6px;padding:8px;text-align:center;font-size:11px;color:#58a6ff;cursor:pointer;transition:all .15s}
+.app-add-btn:hover{background:#1f6feb22;border-color:#58a6ff}
+.fb-section{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px;margin-bottom:8px}
+.fb-label{font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fb-input{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:5px;padding:8px;color:#c9d1d9;font-size:11px;font-family:inherit;resize:vertical;min-height:60px}
+.fb-input:focus{outline:0;border-color:#1f6feb}
+.fb-input::placeholder{color:#484f58}
+.fb-submit{background:#1f6feb;border:none;color:#fff;padding:5px 14px;border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit;margin-top:6px;float:right}
+.fb-submit:hover{background:#388bfd}
+.fb-item{display:flex;gap:6px;padding:4px 0;font-size:10px;border-bottom:1px solid #21262d}
+.fb-item:last-child{border-bottom:none}
+.fb-who{color:#a78bfa;min-width:40px;font-weight:600}
+.fb-time{color:#484f58;min-width:32px}
+.fb-text{color:#c9d1d9;flex:1}
+.fb-st{font-size:9px;padding:1px 5px;border-radius:4px}
+.fb-st-ok{background:#3fb95022;color:#3fb950}
+.fb-st-pen{background:#f59e0b22;color:#f59e0b}
+.app-sel{display:flex;gap:4px;margin-bottom:8px}
+.app-sel-btn{padding:3px 10px;border-radius:12px;font-size:10px;border:1px solid #30363d;background:#21262d;color:#8b949e;cursor:pointer;font-family:inherit}
+.app-sel-btn:hover{border-color:#58a6ff;color:#c9d1d9}
+.app-sel-btn.on{background:#1f6feb22;border-color:#58a6ff;color:#58a6ff}
+.ph{font-size:10px;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:6px}
+.ph em{color:#6e7681;font-weight:400;text-transform:none;letter-spacing:0;font-style:normal}
+
+/* COLLAPSIBLE PM SECTIONS */
+.pm-toggle{display:flex;align-items:center;padding:5px 8px;border-radius:5px;cursor:pointer;margin-bottom:2px;user-select:none}
+.pm-toggle:hover{background:#161b22}
+.pm-toggle .arrow{font-size:10px;color:#6e7681;margin-right:6px;transition:transform .15s}
+.pm-toggle.collapsed .arrow{transform:rotate(-90deg)}
+.pm-body{padding-left:0}
+.pm-body.hidden{display:none}
+
+/* AGENT TOGGLE */
+.agent-toggle{cursor:pointer;user-select:none}
+.agent-toggle .ag-arrow{font-size:9px;color:#6e7681;margin-right:4px;transition:transform .15s;display:inline-block}
+.agent-toggle.collapsed .ag-arrow{transform:rotate(-90deg)}
+.agent-kids{padding-left:0;transition:all .15s}
+.agent-kids.hidden{display:none}
+
+/* NODES */
+.nd{margin-bottom:1px}
+.rw{display:flex;align-items:center;padding:5px 8px;border-radius:5px;transition:background .1s;min-height:30px}
+.rw:hover{background:#161b22}
+.ind{width:18px;flex-shrink:0;position:relative}
+.ind.p::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:#21262d}
+.ind.p::after{content:'';position:absolute;top:50%;left:50%;width:9px;height:1px;background:#21262d}
+
+.ic{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;margin-right:6px;flex-shrink:0}
+.ic-a{background:#8b5cf6;color:#fff}.ic-pm{background:#06b6d4;color:#fff}
+.ic-ar{background:#3b82f6;color:#fff}.ic-en{background:#10b981;color:#fff}
+.ic-ui{background:#ec4899;color:#fff}.ic-qa{background:#f59e0b;color:#fff}
+.ic-rp{background:#ef4444;color:#fff}
+
+.nm{font-size:11px;font-weight:700;color:#f0f6fc;margin-right:6px;white-space:nowrap}
+.bg{font-size:9px;padding:2px 6px;border-radius:7px;font-weight:700;margin-right:6px;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+.bg-run{background:#10b98122;color:#10b981;border:1px solid #10b98133}
+.bg-done{background:#3fb95022;color:#3fb950;border:1px solid #3fb95033}
+.bg-blk{background:#f8514922;color:#f85149;border:1px solid #f8514933}
+.bg-wait{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b33}
+.bg-pau{background:#d2992222;color:#d29922;border:1px solid #d2992233}
+.bg-stp{background:#f8514922;color:#f85149;border:1px solid #f8514933}
+.bg-idle{background:#6e768122;color:#6e7681;border:1px solid #6e768133}
+.bg-rev{background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa33}
+.bg-fade{background:#3fb95022;color:#3fb950;border:1px solid #3fb95033}
+
+.mt{font-size:10px;color:#6e7681;margin-right:6px;white-space:nowrap}
+.tk{font-size:11px;color:#8b949e;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px}
+
+/* AGENT CONTEXT — live thinking + done steps */
+.agent-ctx{margin-left:48px;margin-top:1px;margin-bottom:3px;padding:6px 10px;background:#0d1117;border:1px solid #1f6feb33;border-radius:5px;display:none;max-width:600px;font-size:10px}
+.agent-ctx.open{display:block;animation:sld .12s ease}
+.ctx-think{color:#3fb950;padding:2px 0;display:flex;align-items:flex-start;gap:5px}
+.ctx-think .ctx-dot{width:5px;height:5px;border-radius:50%;background:#3fb950;margin-top:4px;flex-shrink:0;animation:pls 2s infinite}
+.ctx-think .ctx-line{flex:1}
+.ctx-done-step{color:#6e7681;padding:1px 0;display:flex;align-items:flex-start;gap:5px;font-size:9px}
+.ctx-done-step .ctx-chk{color:#3fb950;flex-shrink:0}
+.ctx-meta{color:#484f58;font-size:9px;padding:3px 0 0;border-top:1px solid #21262d;margin-top:3px;display:flex;gap:10px}
+.ctx-meta span{display:flex;gap:3px}
+
+/* BUTTONS */
+.btns{display:flex;gap:2px;opacity:0;transition:opacity .1s;flex-shrink:0}
+.rw:hover .btns{opacity:1}
+.bt{padding:3px 7px;border-radius:4px;font-size:10px;border:1px solid #30363d;background:#21262d;color:#c9d1d9;cursor:pointer;font-family:inherit;transition:all .1s;white-space:nowrap}
+.bt:hover{background:#30363d;border-color:#484f58}
+.bt-p:hover{background:#d2992233;border-color:#d29922;color:#d29922}
+.bt-al:hover{background:#1f6feb33;border-color:#1f6feb;color:#58a6ff}
+.bt-ex:hover{background:#8b5cf633;border-color:#8b5cf6;color:#a78bfa}
+.bt-st:hover{background:#f8514933;border-color:#f85149;color:#f85149}
+.bt-ctx:hover{background:#06b6d433;border-color:#06b6d4;color:#06b6d4}
+.bt-res{background:#10b98122!important;border-color:#10b981!important;color:#10b981!important;opacity:1!important}
+
+/* DECISION LOG */
+.dlog{margin-left:48px;margin-top:1px;margin-bottom:3px;padding:6px 10px;background:#161b22;border:1px solid #21262d;border-radius:5px;display:none;max-width:580px}
+.dlog.open{display:block;animation:sld .12s ease}
+@keyframes sld{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
+.dl{font-size:10px;color:#8b949e;padding:2px 0;display:flex;gap:5px}
+.dl-n{color:#6e7681;min-width:12px;text-align:right}
+.dl-t{flex:1}
+.dl-d{color:#3fb950}.dl-a{color:#58a6ff}
+.dl-h{color:#a78bfa;font-style:italic}
+.loop-count{font-size:9px;background:#f59e0b22;color:#f59e0b;padding:1px 5px;border-radius:4px;margin-left:4px}
+.sub-label{font-size:9px;color:#a78bfa;margin-left:4px;font-style:italic}
+
+/* DONE AGENT FADE */
+.done-fading{transition:all .8s}
+.done-fading .rw{opacity:.25}
+
+/* REPAIR SUBAGENT */
+.repair-spawn{border-left:2px solid #ef444444;margin-left:18px;animation:sld .2s ease}
+
+/* ====== PLAN VIEW ====== */
+.pv-tabs{display:flex;gap:2px;margin-bottom:8px}
+.pv-tab{padding:4px 10px;border-radius:5px;font-size:10px;cursor:pointer;border:1px solid transparent;background:0;color:#8b949e;font-family:inherit;font-weight:600}
+.pv-tab:hover{background:#21262d;color:#c9d1d9}
+.pv-tab.on{background:#1f6feb22;color:#58a6ff;border-color:#1f6feb44}
+.pv-view{display:none}
+.pv-view.on{display:block}
+
+/* Plan items */
+.pi{padding:4px 6px;border-radius:5px;display:flex;align-items:center;gap:6px;font-size:11px;transition:background .1s;cursor:default}
+.pi:hover{background:#161b22}
+.p-ind{width:14px;flex-shrink:0}
+.p-ic{font-size:11px;width:16px;text-align:center;flex-shrink:0}
+.p-lb{flex:1;color:#c9d1d9}
+.p-ag{font-size:10px;color:#6e7681;cursor:pointer}
+.p-ag:hover{color:#58a6ff;text-decoration:underline}
+.p-st{font-size:9px;padding:1px 5px;border-radius:5px}
+.ps-d{background:#3fb95022;color:#3fb950}.ps-p{background:#1f6feb22;color:#58a6ff}
+.ps-w{background:#6e768122;color:#8b949e}.ps-b{background:#f8514922;color:#f85149}
+.p-edit{font-size:10px;color:#6e7681;cursor:pointer;opacity:0;transition:opacity .1s;padding:2px 4px}
+.pi:hover .p-edit{opacity:1}
+.p-edit:hover{color:#58a6ff}
+.p-tog{font-size:9px;color:#6e7681;cursor:pointer;opacity:0;transition:opacity .1s;padding:2px 4px}
+.pi:hover .p-tog{opacity:1}
+.p-tog:hover{color:#a78bfa}
+
+/* Plan context expand */
+.plan-ctx{padding:4px 6px 4px 50px;display:none;font-size:10px;color:#8b949e;background:#0d111788;border-radius:0 0 5px 5px;margin-top:-2px;margin-bottom:2px}
+.plan-ctx.open{display:block;animation:sld .12s ease}
+.pctx-row{display:flex;gap:6px;padding:1px 0}
+.pctx-label{color:#6e7681;min-width:52px;font-weight:600;font-size:9px}
+.pctx-val{color:#c9d1d9;flex:1}
+
+/* Project toggle in plan */
+.proj-toggle{cursor:pointer;user-select:none}
+.proj-toggle:hover{background:#161b22}
+.proj-toggle .pj-arrow{font-size:10px;color:#6e7681;margin-right:4px;transition:transform .15s;display:inline-block}
+.proj-toggle.collapsed .pj-arrow{transform:rotate(-90deg)}
+.proj-body{padding-left:0}
+.proj-body.hidden{display:none}
+
+/* KANBAN VIEW */
+.kanban{display:flex;gap:8px;height:100%}
+.kb-col{flex:1;background:#161b22;border:1px solid #21262d;border-radius:6px;display:flex;flex-direction:column;overflow:hidden}
+.kb-hdr{padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:6px}
+.kb-hdr .kb-cnt{font-weight:400;color:#6e7681}
+.kb-todo .kb-hdr{color:#8b949e}.kb-prog .kb-hdr{color:#58a6ff}.kb-comp .kb-hdr{color:#3fb950}
+.kb-body{flex:1;overflow-y:auto;padding:6px}
+.kb-card{background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:8px 10px;margin-bottom:5px;font-size:10px;transition:border-color .15s}
+.kb-card:hover{border-color:#30363d}
+.kb-card-title{font-weight:700;color:#f0f6fc;margin-bottom:3px;font-size:11px}
+.kb-card-meta{color:#6e7681;display:flex;gap:8px;flex-wrap:wrap}
+.kb-card-agent{color:#58a6ff;cursor:pointer}
+.kb-card-agent:hover{text-decoration:underline}
+.kb-card-tag{padding:1px 5px;border-radius:3px;font-size:9px}
+
+/* TO-DO / COMPLETE FOLDER VIEW */
+.fv-hdr{display:flex;align-items:center;cursor:pointer;user-select:none;padding:4px 6px;border-radius:4px}
+.fv-hdr:hover{background:#161b22}
+.fv-arrow{font-size:10px;color:#6e7681;margin-right:5px;transition:transform .15s;display:inline-block}
+.fv-hdr.collapsed .fv-arrow{transform:rotate(-90deg)}
+.fv-ic{margin-right:5px;font-size:11px}
+.fv-name{font-size:11px;color:#c9d1d9;font-weight:600}
+.fv-count{font-size:9px;color:#6e7681;margin-left:6px}
+.fv-body{padding-left:16px}
+.fv-body.hidden{display:none}
+.fv-item{display:flex;align-items:center;gap:5px;padding:3px 6px;font-size:10px;color:#8b949e;border-radius:4px}
+.fv-item:hover{background:#161b22}
+.fv-status{font-size:9px;padding:1px 4px;border-radius:3px}
+.fv-add{font-size:10px;color:#1f6feb;cursor:pointer;padding:3px 6px;display:flex;align-items:center;gap:4px;border-radius:4px}
+.fv-add:hover{background:#1f6feb11}
+
+/* CHANGELOG */
+.clog{border-top:1px solid #21262d;padding-top:6px;margin-top:8px;position:relative}
+.clog-scroll{max-height:160px;overflow-y:auto;scroll-behavior:smooth}
+.clog-ctrl{display:flex;gap:4px;position:absolute;top:6px;right:0}
+.clog-btn{background:#21262d;border:1px solid #30363d;border-radius:4px;color:#8b949e;font-size:10px;cursor:pointer;padding:1px 6px;font-family:inherit}
+.clog-btn:hover{background:#30363d;color:#c9d1d9}
+.cl{font-size:10px;color:#6e7681;padding:2px 0;display:flex;gap:5px}
+.cl-t{color:#484f58;min-width:40px}
+.cl-w{min-width:60px}
+.cl-h{color:#a78bfa}.cl-ag{color:#58a6ff}
+.cl-x{color:#8b949e;flex:1}
+
+/* CASCADE PAUSE */
+.paused-sub{opacity:.35;pointer-events:none}
+.paused-sub .rw:hover{background:0}
+
+/* LIVE DOT */
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.35}}
+.lv{width:5px;height:5px;border-radius:50%;background:#3fb950;animation:pls 2s infinite;display:inline-block;margin-right:3px}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:#0d1117cc;display:none;align-items:center;justify-content:center;z-index:100}
+.ov.open{display:flex}
+.mdl{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;width:400px;max-width:90vw}
+.mdl h3{font-size:12px;color:#f0f6fc;margin-bottom:2px}
+.mdl p{font-size:10px;color:#8b949e;margin-bottom:8px}
+.mdl textarea{width:100%;padding:7px 9px;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#c9d1d9;font-family:inherit;font-size:11px;resize:vertical;min-height:44px}
+.mdl textarea:focus{outline:0;border-color:#1f6feb}
+.mdl-a{display:flex;gap:5px;margin-top:8px;justify-content:flex-end}
+.mb{padding:4px 12px;border-radius:5px;font-size:10px;border:1px solid #30363d;background:#21262d;color:#c9d1d9;cursor:pointer;font-family:inherit}
+.mb.pr{background:#1f6feb;border-color:#1f6feb;color:#fff}.mb.pr:hover{background:#388bfd}
+
+.toast{position:fixed;bottom:16px;right:16px;background:#161b22;border:1px solid #30363d;border-radius:5px;padding:8px 12px;font-size:10px;z-index:200;transform:translateY(60px);opacity:0;transition:all .2s;max-width:360px}
+.toast.show{transform:translateY(0);opacity:1}
+.edit-mdl textarea{min-height:60px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>⚡ Software Factory</h1>
+  <div class="tabs">
+    <button class="tab on" onclick="swTab(this)">Athena-Build</button>
+    <button class="tab" onclick="swTab(this)">Athena-Ideation</button>
+    <button class="tab" onclick="swTab(this)">Athena-Marketing</button>
+  </div>
+  <div class="sbar">
+    <span><span class="sd sd-g"></span>6 running</span>
+    <span><span class="sd sd-y"></span>1 idle</span>
+    <span><span class="sd sd-r"></span>1 blocked → repair</span>
+    <span>8/16 done</span>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- ===================== LEFT: WORKTREE ===================== -->
+<div class="pnl pnl-l">
+<div class="ph">Agent Worktree <em>· live thinking · per-agent controls</em></div>
+
+<!-- ATHENA-BUILD -->
+<div class="nd" id="nd-athena">
+  <div class="rw agent-toggle" onclick="togAgent('athena-kids',this)">
+    <span class="ag-arrow">▼</span>
+    <div class="ic ic-a">A</div>
+    <span class="nm">Athena-Build</span>
+    <span class="bg bg-run" id="bg-ath"><span class="lv"></span>Running</span>
+    <span class="mt">8/16</span>
+    <span class="tk">2 projects active</span>
+    <div class="btns">
+      <button class="bt bt-p" onclick="event.stopPropagation();cascP('nd-athena',this)">⏸ Pause All</button>
+      <button class="bt bt-al" onclick="event.stopPropagation();oAlign('Athena-Build')">✎ Align</button>
+      <button class="bt bt-ctx" onclick="event.stopPropagation();tog('ctx-ath')">◉ Context</button>
+      <button class="bt bt-ex" onclick="event.stopPropagation();tog('dl-ath')">▶ Decisions</button>
+      <button class="bt bt-st" onclick="event.stopPropagation();stp(this,'Athena-Build')">⏹ Stop</button>
+    </div>
+  </div>
+  <div class="agent-ctx" id="ctx-ath">
+    <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Monitoring 2 projects — PM-1 has a QA loop running, PM-2 engineers still iterating. Need to check if Eng-3 block resolves soon or if I should reassign.</span></div>
+    <div class="ctx-done-step"><span class="ctx-chk">✓</span> Spawned PM-1 for Payments Dashboard (Sprint 3)</div>
+    <div class="ctx-done-step"><span class="ctx-chk">✓</span> Spawned PM-2 for Claims Portal (Sprint 1, HIPAA 10/10 gate)</div>
+    <div class="ctx-done-step"><span class="ctx-chk">✓</span> Set quality gates: PM-1=9/10, PM-2=10/10</div>
+    <div class="ctx-meta"><span>Skills: orchestration, pm-spawning, gate-mgmt</span><span>Uptime: 47m</span></div>
+  </div>
+  <div class="dlog" id="dl-ath">
+    <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Spawned PM-1 for payments-dashboard</span></div>
+    <div class="dl dl-d"><span class="dl-n">2</span><span class="dl-t">✓ Spawned PM-2 for claims-portal</span></div>
+    <div class="dl dl-a"><span class="dl-n">3</span><span class="dl-t">Monitoring: 6 agents active across 2 projects</span></div>
+  </div>
+
+  <div class="agent-kids" id="athena-kids">
+
+  <!-- ===== PM-1: PAYMENTS ===== -->
+  <div class="nd" id="nd-pm1">
+    <div class="pm-toggle" onclick="togPM('pm1-body',this)">
+      <span class="arrow">▼</span>
+      <div class="ic ic-pm">PM</div>
+      <span class="nm">PM-1 Payments</span>
+      <span class="bg bg-run"><span class="lv"></span>Running</span>
+      <span class="mt">Sprint 3 · gate: 9/10</span>
+      <span class="tk">4 active, 1 blocked</span>
+      <div class="btns">
+        <button class="bt bt-p" onclick="event.stopPropagation();cascP('nd-pm1',this)">⏸ Pause</button>
+        <button class="bt bt-al" onclick="event.stopPropagation();oAlign('PM-1')">✎</button>
+        <button class="bt bt-ctx" onclick="event.stopPropagation();tog('ctx-pm1')">◉</button>
+        <button class="bt bt-ex" onclick="event.stopPropagation();tog('dl-pm1')">▶</button>
+        <button class="bt bt-st" onclick="event.stopPropagation();stp(this,'PM-1')">⏹</button>
+      </div>
+    </div>
+    <div class="agent-ctx" id="ctx-pm1">
+      <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">QA batch running loop 2 on PM-002 and PM-006. Once those clear, Eng-3 can unblock. Considering if we need to reorder sprint backlog.</span></div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> Decomposed epic into 6 tickets with dependency graph</div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> Research: chose Knex over Prisma (convention match)</div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> Assigned Architect, 4 Engineers, UI Agent, QA</div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> PM-001 (DB migration) complete: 10/10</div>
+      <div class="ctx-meta"><span>Tickets: 2 done, 3 in-progress, 1 blocked</span><span>Gate: 9/10</span></div>
+    </div>
+    <div class="dlog" id="dl-pm1">
+      <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Decomposed into 6 tickets</span></div>
+      <div class="dl dl-d"><span class="dl-n">2</span><span class="dl-t">✓ Research: Knex (stable, convention) over Prisma (trending, no match)</span></div>
+      <div class="dl dl-a"><span class="dl-n">3</span><span class="dl-t">QA reviewing batch — waiting on final scores</span></div>
+    </div>
+    <div class="pm-body" id="pm1-body">
+
+      <!-- Engineer-2 (IDLE — waiting for QA handoff) -->
+      <div class="nd" id="nd-en2">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-en">En</div>
+          <span class="nm">Engineer-2</span>
+          <span class="bg bg-wait">Idle</span>
+          <span class="mt">completed → sent to QA</span>
+          <span class="tk">PM-002: REST API + Vault — awaiting QA batch feedback</span>
+          <div class="btns">
+            <button class="bt bt-ctx" onclick="tog('ctx-en2')">◉</button>
+            <button class="bt bt-ex" onclick="tog('dl-en2')">▶</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-en2">
+          <div class="ctx-think"><span class="ctx-dot" style="background:#f59e0b"></span><span class="ctx-line" style="color:#f59e0b">Idle — submitted to QA. Waiting for batch feedback on error handler pattern.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Loaded migration output from PM-001</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Found Vault wrapper at src/integrations/vault.ts</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Generated 4 route files using Express convention</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Self-eval: 9/10, CI: pass → handed off to QA</div>
+          <div class="ctx-meta"><span>Files: src/routes/payments/*.ts, vault.ts</span><span>Score: 9/10</span></div>
+        </div>
+        <div class="dlog" id="dl-en2">
+          <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Loaded migration output from PM-001</span></div>
+          <div class="dl dl-d"><span class="dl-n">2</span><span class="dl-t">✓ Found Vault wrapper: src/integrations/vault.ts</span></div>
+          <div class="dl dl-d"><span class="dl-n">3</span><span class="dl-t">✓ Generated 4 route files (Express convention)</span></div>
+          <div class="dl dl-d"><span class="dl-n">4</span><span class="dl-t">✓ Self-eval: 9/10, CI: pass → handed off to QA</span></div>
+        </div>
+      </div>
+
+      <!-- Engineer-3 (BLOCKED → Repair spawned) -->
+      <div class="nd" id="nd-en3">
+        <div class="rw agent-toggle" onclick="togAgent('en3-kids',this)" style="background:#f8514908">
+          <span class="ag-arrow">▼</span>
+          <div class="ind p"></div>
+          <div class="ic ic-en">En</div>
+          <span class="nm">Engineer-3</span>
+          <span class="bg bg-blk">Blocked</span>
+          <span class="tk">PM-003: Permission gates — waiting on PM-002</span>
+          <div class="btns">
+            <button class="bt bt-ctx" onclick="event.stopPropagation();tog('ctx-en3')">◉</button>
+            <button class="bt bt-ex" onclick="event.stopPropagation();tog('dl-en3')">▶</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-en3">
+          <div class="ctx-think"><span class="ctx-dot" style="background:#f85149"></span><span class="ctx-line" style="color:#f85149">Blocked — need PM-002 Vault integration to be QA-approved before I can build permission gates on top of it. Repair agent analyzing options.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Read ticket PM-003: permission gates + audit logging</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Identified dependency: needs PM-002 API routes finalized</div>
+          <div class="ctx-meta"><span>Blocked by: PM-002 (QA loop 2)</span><span>Repair: analyzing</span></div>
+        </div>
+        <div class="dlog" id="dl-en3">
+          <div class="dl dl-a"><span class="dl-n">1</span><span class="dl-t">Cannot start — depends on PM-002 (in QA review)</span></div>
+          <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Auto-spawned Repair agent to analyze block</span></div>
+        </div>
+        <div class="agent-kids" id="en3-kids">
+          <div class="nd">
+            <div class="rw repair-spawn">
+              <div class="ind p"></div><div class="ind p"></div>
+              <div class="ic ic-rp">R</div>
+              <span class="nm">Repair</span>
+              <span class="sub-label">← auto-spawned</span>
+              <span class="bg bg-run"><span class="lv"></span>Analyzing</span>
+              <span class="tk">Resolving Eng-3 block: PM-002 in QA loop 2</span>
+              <div class="btns">
+                <button class="bt bt-ctx" onclick="tog('ctx-rp1')">◉</button>
+                <button class="bt bt-ex" onclick="tog('dl-rp1')">▶</button>
+                <button class="bt bt-st" onclick="stp(this,'Repair')">⏹</button>
+              </div>
+            </div>
+            <div class="agent-ctx" id="ctx-rp1">
+              <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Analyzing dependency graph — PM-002 is in QA loop 2, Eng-2 is fixing error handler. ETA ~5 min. Checking if Eng-3 can start with draft API contract instead.</span></div>
+              <div class="ctx-done-step"><span class="ctx-chk">✓</span> Detected: Eng-3 blocked on PM-002 output</div>
+              <div class="ctx-done-step"><span class="ctx-chk">✓</span> PM-002 in QA loop 2 — Eng-2 fixing error handler</div>
+              <div class="ctx-meta"><span>Options: wait (5m ETA) | start with draft | escalate to PM</span></div>
+            </div>
+            <div class="dlog" id="dl-rp1">
+              <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Detected: Eng-3 blocked on PM-002 output</span></div>
+              <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Recommending: wait 5 min (QA loop expected to close)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI Agent (working) -->
+      <div class="nd" id="nd-ui">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-ui">UI</div>
+          <span class="nm">UI Agent</span>
+          <span class="bg bg-run"><span class="lv"></span>Working</span>
+          <span class="mt">iter 1 · self: 7/10</span>
+          <span class="tk">PM-004: React components — list, form, detail, modals</span>
+          <div class="btns">
+            <button class="bt bt-p" onclick="togP(this)">⏸</button>
+            <button class="bt bt-al" onclick="oAlign('UI Agent')">✎</button>
+            <button class="bt bt-ctx" onclick="tog('ctx-ui')">◉</button>
+            <button class="bt bt-ex" onclick="tog('dl-ui')">▶</button>
+            <button class="bt bt-st" onclick="stp(this,'UI Agent')">⏹</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-ui">
+          <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Building PaymentMethodForm — thinking I should use the existing FormWrapper from shared/ instead of raw form elements. Also need to wire up Zod validation schema for card type enum.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Found DataTable in src/components/shared/ — reusing</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Scaffolded PaymentMethodList with sort/filter props</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Created ConfirmDeleteModal with Shadcn Dialog</div>
+          <div class="ctx-meta"><span>Files: src/components/payments/*.tsx</span><span>Self: 7/10 — needs validation</span></div>
+        </div>
+        <div class="dlog" id="dl-ui">
+          <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Found DataTable in src/components/shared/</span></div>
+          <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Using DataTable with sort/filter props (convention match)</span></div>
+        </div>
+      </div>
+
+      <!-- QA (REVIEWING — with subagents) -->
+      <div class="nd" id="nd-qa1">
+        <div class="rw agent-toggle" onclick="togAgent('qa1-kids',this)" style="background:#f59e0b08;border-left:2px solid #f59e0b44">
+          <span class="ag-arrow">▼</span>
+          <div class="ind p"></div>
+          <div class="ic ic-qa">QA</div>
+          <span class="nm">QA</span>
+          <span class="bg bg-rev">Reviewing</span>
+          <span class="mt">found 2 issues</span>
+          <span class="tk">Batch review — Engineers fixing</span>
+          <span class="loop-count">loop 2</span>
+          <div class="btns">
+            <button class="bt bt-p" onclick="event.stopPropagation();cascP('nd-qa1',this)">⏸</button>
+            <button class="bt bt-ctx" onclick="event.stopPropagation();tog('ctx-qa1')">◉</button>
+            <button class="bt bt-ex" onclick="event.stopPropagation();tog('dl-qa1')">▶</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-qa1">
+          <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Waiting on Eng-2 (error handler fix) and Eng-4 (flag naming). Once both report back I'll re-review the batch. If clean, scores should hit 9+/10 and we can close the loop.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Received PM-001, PM-002, PM-006 outputs for batch review</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> PM-001: clean — 10/10, no issues</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> PM-002: generic error handler → needs ErrorBoundary (flagged)</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> PM-006: flag key naming convention mismatch (flagged)</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Spawned Eng-2 + Eng-4 as subagents to fix batch</div>
+          <div class="ctx-meta"><span>Loop: 2 of max 5</span><span>Target: triple consensus ≥ 9</span></div>
+        </div>
+        <div class="dlog" id="dl-qa1">
+          <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Received PM-001, PM-002, PM-006 outputs</span></div>
+          <div class="dl dl-d"><span class="dl-n">2</span><span class="dl-t">✓ Found 2 issues across PM-002 and PM-006</span></div>
+          <div class="dl dl-a"><span class="dl-n">3</span><span class="dl-t">Called Engineer-2 and Engineer-4 as subagents</span></div>
+        </div>
+
+        <div class="agent-kids" id="qa1-kids">
+          <div class="nd" id="nd-en2-qa">
+            <div class="rw" style="border-left:2px solid #f59e0b22;margin-left:18px">
+              <div class="ind p"></div>
+              <div class="ic ic-en" style="opacity:.8">En</div>
+              <span class="nm">Engineer-2</span>
+              <span class="sub-label">← QA subagent</span>
+              <span class="bg bg-run"><span class="lv"></span>Fixing</span>
+              <span class="mt">QA loop 2</span>
+              <span class="tk">Switching to ErrorBoundary middleware</span>
+              <div class="btns">
+                <button class="bt bt-p" onclick="togP(this)">⏸</button>
+                <button class="bt bt-al" onclick="oAlign('Engineer-2 (QA sub)')">✎</button>
+                <button class="bt bt-ctx" onclick="tog('ctx-en2-qa')">◉</button>
+                <button class="bt bt-ex" onclick="tog('dl-en2-qa')">▶</button>
+                <button class="bt bt-st" onclick="stp(this,'Engineer-2')">⏹</button>
+              </div>
+            </div>
+            <div class="agent-ctx" id="ctx-en2-qa" style="margin-left:66px">
+              <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Replacing generic catch-all with ErrorBoundary middleware — human aligned this as override. Need to update the test mocks too since they expect the old error shape.</span></div>
+              <div class="ctx-done-step"><span class="ctx-chk">✓</span> Received QA batch: error handler doesn't match convention</div>
+              <div class="ctx-done-step"><span class="ctx-chk">✓</span> Human aligned: "use ErrorBoundary middleware" (override)</div>
+              <div class="ctx-meta"><span>File: src/middleware/ErrorBoundary.ts</span></div>
+            </div>
+            <div class="dlog" id="dl-en2-qa" style="margin-left:66px">
+              <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Received QA batch: error handler issue</span></div>
+              <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Replacing generic handler with ErrorBoundary middleware</span></div>
+            </div>
+          </div>
+
+          <div class="nd" id="nd-en4-qa">
+            <div class="rw" style="border-left:2px solid #f59e0b22;margin-left:18px">
+              <div class="ind p"></div>
+              <div class="ic ic-en" style="opacity:.8">En</div>
+              <span class="nm">Engineer-4</span>
+              <span class="sub-label">← QA subagent</span>
+              <span class="bg bg-run"><span class="lv"></span>Fixing</span>
+              <span class="mt">QA loop 2</span>
+              <span class="tk">Renaming feature flag key to match convention</span>
+              <div class="btns">
+                <button class="bt bt-p" onclick="togP(this)">⏸</button>
+                <button class="bt bt-ctx" onclick="tog('ctx-en4-qa')">◉</button>
+                <button class="bt bt-ex" onclick="tog('dl-en4-qa')">▶</button>
+                <button class="bt bt-st" onclick="stp(this,'Engineer-4')">⏹</button>
+              </div>
+            </div>
+            <div class="agent-ctx" id="ctx-en4-qa" style="margin-left:66px">
+              <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Renaming payment_methods_manage → payment_methods:manage. Also updating featureGate middleware to parse colon-separated keys. Should be quick fix.</span></div>
+              <div class="ctx-done-step"><span class="ctx-chk">✓</span> Received QA batch: flag naming convention mismatch</div>
+              <div class="ctx-meta"><span>Files: feature-flags.ts, featureGate.ts</span></div>
+            </div>
+            <div class="dlog" id="dl-en4-qa" style="margin-left:66px">
+              <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Received QA batch: flag naming issue</span></div>
+              <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Renaming payment_methods_manage → payment_methods:manage</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /QA -->
+
+      <!-- DONE AGENTS (sunk to bottom, fading) -->
+      <div class="nd done-fading" id="nd-arch">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-ar" style="opacity:.5">Ar</div>
+          <span class="nm" style="opacity:.5">Architect</span>
+          <span class="bg bg-done">✓ Done</span>
+          <span class="mt" style="opacity:.5">fading</span>
+          <span class="tk" style="opacity:.5">System design completed</span>
+          <div class="btns"><button class="bt bt-ctx" onclick="tog('ctx-ar')">◉</button></div>
+        </div>
+        <div class="agent-ctx" id="ctx-ar">
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Defined PaymentMethod entity: type(enum), label, is_default, vault_ref</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> API contract: 5 endpoints + set-default</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Chose audit_log as separate table (convention match)</div>
+          <div class="ctx-meta"><span>Score: 10/10</span><span>Completed — fading from tree</span></div>
+        </div>
+      </div>
+
+      <div class="nd done-fading" id="nd-en1">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-en" style="opacity:.5">En</div>
+          <span class="nm" style="opacity:.5">Engineer-1</span>
+          <span class="bg bg-done">✓ Done</span>
+          <span class="mt" style="opacity:.5">2 iter · fading</span>
+          <span class="tk" style="opacity:.5">PM-001: DB migration</span>
+          <div class="btns"><button class="bt bt-ctx" onclick="tog('ctx-en1')">◉</button></div>
+        </div>
+        <div class="agent-ctx" id="ctx-en1">
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Used Knex migration pattern from convention map</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Added timestamps (created_at/updated_at convention)</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Created audit_log table + index on type column</div>
+          <div class="ctx-meta"><span>Score: 10/10 · 2 iter</span><span>Files: migrations/003_*.ts, 004_*.ts</span></div>
+        </div>
+      </div>
+
+    </div><!-- /pm1-body -->
+  </div><!-- /PM-1 -->
+
+  <!-- ===== PM-2: CLAIMS ===== -->
+  <div class="nd" id="nd-pm2">
+    <div class="pm-toggle" onclick="togPM('pm2-body',this)">
+      <span class="arrow">▼</span>
+      <div class="ic ic-pm">PM</div>
+      <span class="nm">PM-2 Claims</span>
+      <span class="bg bg-run"><span class="lv"></span>Running</span>
+      <span class="mt">Sprint 1 · gate: 10/10</span>
+      <span class="tk">3 active — HIPAA</span>
+      <div class="btns">
+        <button class="bt bt-p" onclick="event.stopPropagation();cascP('nd-pm2',this)">⏸ Pause</button>
+        <button class="bt bt-al" onclick="event.stopPropagation();oAlign('PM-2')">✎</button>
+        <button class="bt bt-ctx" onclick="event.stopPropagation();tog('ctx-pm2')">◉</button>
+        <button class="bt bt-ex" onclick="event.stopPropagation();tog('dl-pm2')">▶</button>
+      </div>
+    </div>
+    <div class="agent-ctx" id="ctx-pm2">
+      <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Both engineers iterating on DB + API. HIPAA requires 10/10 so I expect more QA loops than PM-1. Need to prep CL-003 and CL-004 tickets for next sprint.</span></div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> Decomposed ClaimType CRUD into 4 tickets</div>
+      <div class="ctx-done-step"><span class="ctx-chk">✓</span> Research: Go + Postgres matches claims-portal stack</div>
+      <div class="ctx-meta"><span>Gate: 10/10 (HIPAA)</span><span>Tickets: 0 done, 2 active, 2 backlog</span></div>
+    </div>
+    <div class="dlog" id="dl-pm2">
+      <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Decomposed ClaimType CRUD into 4 tickets</span></div>
+      <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Quality gate 10/10 — HIPAA product</span></div>
+    </div>
+    <div class="pm-body" id="pm2-body">
+
+      <div class="nd">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-en">En</div>
+          <span class="nm">Engineer-5</span>
+          <span class="bg bg-run"><span class="lv"></span>Working</span>
+          <span class="mt">iter 2 · self: 8/10</span>
+          <span class="tk">CL-001: Go migration — claim_types + audit trail</span>
+          <div class="btns">
+            <button class="bt bt-p" onclick="togP(this)">⏸</button>
+            <button class="bt bt-al" onclick="oAlign('Engineer-5')">✎</button>
+            <button class="bt bt-ctx" onclick="tog('ctx-en5')">◉</button>
+            <button class="bt bt-ex" onclick="tog('dl-en5')">▶</button>
+            <button class="bt bt-st" onclick="stp(this,'Engineer-5')">⏹</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-en5">
+          <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Adding HIPAA audit columns — access_log needs jsonb type for structured audit entries. Checking if claims-portal already has a jsonb convention or if they use text with JSON encoding.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Used Go migrate pattern from existing claims-portal</div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Created claim_types table with required fields</div>
+          <div class="ctx-meta"><span>Files: migrations/001_claim_types.go</span><span>Iter 2: adding audit cols</span></div>
+        </div>
+        <div class="dlog" id="dl-en5">
+          <div class="dl dl-d"><span class="dl-n">1</span><span class="dl-t">✓ Used Go migrate pattern from existing claims-portal</span></div>
+          <div class="dl dl-a"><span class="dl-n">2</span><span class="dl-t">Adding HIPAA audit columns (access_log, modified_by, ip_address)</span></div>
+        </div>
+      </div>
+
+      <div class="nd">
+        <div class="rw">
+          <div class="ind p"></div>
+          <div class="ic ic-en">En</div>
+          <span class="nm">Engineer-6</span>
+          <span class="bg bg-run"><span class="lv"></span>Working</span>
+          <span class="mt">iter 1 · self: 6/10</span>
+          <span class="tk">CL-002: Go API handlers + middleware</span>
+          <div class="btns">
+            <button class="bt bt-p" onclick="togP(this)">⏸</button>
+            <button class="bt bt-ctx" onclick="tog('ctx-en6')">◉</button>
+            <button class="bt bt-ex" onclick="tog('dl-en6')">▶</button>
+            <button class="bt bt-st" onclick="stp(this,'Engineer-6')">⏹</button>
+          </div>
+        </div>
+        <div class="agent-ctx" id="ctx-en6">
+          <div class="ctx-think"><span class="ctx-dot"></span><span class="ctx-line">Generating chi router handler stubs. The HIPAA audit middleware needs to intercept both request and response to log access patterns. Thinking about middleware ordering.</span></div>
+          <div class="ctx-done-step"><span class="ctx-chk">✓</span> Identified chi router as the convention for claims-portal</div>
+          <div class="ctx-meta"><span>Files: handlers/claim_type.go</span><span>Self: 6/10 — early iteration</span></div>
+        </div>
+        <div class="dlog" id="dl-en6">
+          <div class="dl dl-a"><span class="dl-n">1</span><span class="dl-t">Generating Go handler stubs following chi router convention</span></div>
+        </div>
+      </div>
+
+      <div class="nd">
+        <div class="rw" style="opacity:.25">
+          <div class="ind p"></div>
+          <div class="ic ic-qa">QA</div>
+          <span class="nm">QA</span>
+          <span class="bg bg-idle">Idle</span>
+          <span class="tk">Waiting for Engineers to complete + self-eval ≥ 8 + CI pass</span>
+        </div>
+      </div>
+
+    </div><!-- /pm2-body -->
+  </div><!-- /PM-2 -->
+
+  </div><!-- /athena-kids -->
+</div><!-- /athena -->
+
+</div><!-- /panel-left -->
+
+<!-- ===================== MIDDLE: PLAN VIEW ===================== -->
+<div class="pnl pnl-m">
+<div class="ph">Plan View <em>· switchable views</em></div>
+
+<!-- VIEW TABS: Active | Kanban | To-Do | Complete -->
+<div class="pv-tabs">
+  <button class="pv-tab on" onclick="swPV(this,'pv-active')">Active</button>
+  <button class="pv-tab" onclick="swPV(this,'pv-kanban')">Kanban</button>
+  <button class="pv-tab" onclick="swPV(this,'pv-todo')">To-Do</button>
+  <button class="pv-tab" onclick="swPV(this,'pv-complete')">Complete</button>
+</div>
+
+<!-- ====== ACTIVE VIEW ====== -->
+<div class="pv-view on" id="pv-active">
+
+<!-- Payments Dashboard (toggleable) -->
+<div class="pi proj-toggle" onclick="togProj('proj-pay',this)">
+  <span class="pj-arrow">▼</span><span class="p-ic">📦</span><span class="p-lb" style="font-weight:700;color:#f0f6fc">Payments Dashboard</span><span class="p-st ps-p">4 active</span>
+</div>
+<div class="proj-body" id="proj-pay">
+
+<div class="pi"><div class="p-ind"></div><span class="p-ic">📁</span><span class="p-lb" style="font-weight:600">Payment Methods CRUD</span><span class="p-ag" onclick="flash('nd-pm1')">PM-1</span></div>
+
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic">⚡</span><span class="p-lb" style="color:#f59e0b">API Layer</span><span class="p-st ps-p">QA Review</span></div>
+<div class="pi" id="plan-pm002"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#f59e0b">●</span><span class="p-lb">PM-002: CRUD + Vault</span><span class="p-ag" onclick="flash('nd-en2-qa')">Engineer-2</span><span class="p-st ps-p">QA loop 2</span><span class="p-tog" onclick="togPlanCtx('pctx-pm002')">◉</span><span class="p-edit" onclick="oEdit('PM-002','REST API: CRUD endpoints + Vault integration')">✏️</span></div>
+<div class="plan-ctx" id="pctx-pm002">
+  <div class="pctx-row"><span class="pctx-label">Ticket</span><span class="pctx-val">REST API: 4 CRUD endpoints + Vault tokenization</span></div>
+  <div class="pctx-row"><span class="pctx-label">Issue</span><span class="pctx-val">Generic error handler → needs ErrorBoundary. Human aligned override.</span></div>
+  <div class="pctx-row"><span class="pctx-label">Blocks</span><span class="pctx-val">PM-003 (permissions) depends on this completing QA</span></div>
+</div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#f85149">○</span><span class="p-lb" style="opacity:.4">PM-003: Permissions</span><span class="p-ag" onclick="flash('nd-en3')" style="opacity:.4">Engineer-3</span><span class="p-st ps-b">Blocked → Repair</span><span class="p-tog" onclick="togPlanCtx('pctx-pm003')">◉</span><span class="p-edit" onclick="oEdit('PM-003','Permission gates + audit logging')">✏️</span></div>
+<div class="plan-ctx" id="pctx-pm003">
+  <div class="pctx-row"><span class="pctx-label">Blocked</span><span class="pctx-val">Depends on PM-002 — Repair agent recommending wait 5m</span></div>
+</div>
+
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic">⚡</span><span class="p-lb" style="color:#ec4899">Frontend</span><span class="p-st ps-p">In Progress</span></div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#58a6ff">●</span><span class="p-lb">PM-004: React components</span><span class="p-ag" onclick="flash('nd-ui')">UI Agent</span><span class="p-st ps-p">iter 1</span><span class="p-tog" onclick="togPlanCtx('pctx-pm004')">◉</span><span class="p-edit" onclick="oEdit('PM-004','React: list, form, detail, modals')">✏️</span></div>
+<div class="plan-ctx" id="pctx-pm004">
+  <div class="pctx-row"><span class="pctx-label">Agent</span><span class="pctx-val">UI Agent · iter 1 · self 7/10 — needs form validation</span></div>
+  <div class="pctx-row"><span class="pctx-label">Approach</span><span class="pctx-val">DataTable (convention match) · Tailwind + Shadcn</span></div>
+</div>
+
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic">⚡</span><span class="p-lb" style="color:#58a6ff">Config</span><span class="p-st ps-p">QA Review</span></div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#f59e0b">●</span><span class="p-lb">PM-006: Feature flags</span><span class="p-ag" onclick="flash('nd-en4-qa')">Engineer-4</span><span class="p-st ps-p">QA loop 2</span><span class="p-edit" onclick="oEdit('PM-006','Feature flags + env config')">✏️</span></div>
+
+<!-- Done tasks sink to bottom of project -->
+<div style="margin-top:6px;padding-top:6px;border-top:1px solid #21262d">
+<div class="pi" style="opacity:.45"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#3fb950">●</span><span class="p-lb">PM-001: migration</span><span class="p-ag" onclick="flash('nd-en1')">Engineer-1</span><span class="p-st ps-d">✓ 10/10</span></div>
+<div class="pi" style="opacity:.45"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#3fb950">●</span><span class="p-lb">System design</span><span class="p-ag" onclick="flash('nd-arch')">Architect</span><span class="p-st ps-d">✓ 10/10</span></div>
+</div>
+
+</div><!-- /proj-pay -->
+
+<!-- Claims Portal (toggleable) -->
+<div class="pi proj-toggle" onclick="togProj('proj-cl',this)">
+  <span class="pj-arrow">▼</span><span class="p-ic">📦</span><span class="p-lb" style="font-weight:700;color:#f0f6fc">Claims Portal</span><span class="p-st ps-p">2 active</span>
+</div>
+<div class="proj-body" id="proj-cl">
+<div class="pi"><div class="p-ind"></div><span class="p-ic">📁</span><span class="p-lb" style="font-weight:600">ClaimType CRUD</span><span class="p-ag" onclick="flash('nd-pm2')">PM-2</span></div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic">⚡</span><span class="p-lb" style="color:#58a6ff">Database + API</span><span class="p-st ps-p">In Progress</span></div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#58a6ff">●</span><span class="p-lb">CL-001: Go migration</span><span class="p-ag" onclick="flash('dl-en5')">Engineer-5</span><span class="p-st ps-p">iter 2</span><span class="p-edit" onclick="oEdit('CL-001','Go migration: claim_types + HIPAA audit trail')">✏️</span></div>
+<div class="pi"><div class="p-ind"></div><div class="p-ind"></div><div class="p-ind"></div><span class="p-ic" style="color:#58a6ff">●</span><span class="p-lb">CL-002: Go API handlers</span><span class="p-ag" onclick="flash('dl-en6')">Engineer-6</span><span class="p-st ps-p">iter 1</span><span class="p-edit" onclick="oEdit('CL-002','Go API handlers + middleware')">✏️</span></div>
+</div><!-- /proj-cl -->
+
+</div><!-- /pv-active -->
+
+<!-- ====== KANBAN VIEW ====== -->
+<div class="pv-view" id="pv-kanban">
+<div class="kanban">
+  <!-- TO DO column -->
+  <div class="kb-col kb-todo">
+    <div class="kb-hdr">To Do <span class="kb-cnt">(2)</span></div>
+    <div class="kb-body">
+      <div class="kb-card">
+        <div class="kb-card-title">PM-003: Permission Gates</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-en3')">Engineer-3</span>
+          <span class="kb-card-tag" style="background:#f8514922;color:#f85149">Blocked</span>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="kb-card">
+        <div class="kb-card-title">CL-003: Frontend Components</div>
+        <div class="kb-card-meta">
+          <span style="color:#6e7681">Unassigned</span>
+          <span class="kb-card-tag" style="background:#6e768122;color:#8b949e">Backlog</span>
+          <span>Claims</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- IN PROGRESS column -->
+  <div class="kb-col kb-prog">
+    <div class="kb-hdr">In Progress <span class="kb-cnt">(4)</span></div>
+    <div class="kb-body">
+      <div class="kb-card" style="border-left:2px solid #f59e0b">
+        <div class="kb-card-title">PM-002: CRUD + Vault</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-en2-qa')">Engineer-2</span>
+          <span class="kb-card-tag" style="background:#a78bfa22;color:#a78bfa">QA loop 2</span>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="kb-card">
+        <div class="kb-card-title">PM-004: React Components</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-ui')">UI Agent</span>
+          <span class="kb-card-tag" style="background:#1f6feb22;color:#58a6ff">iter 1 · 7/10</span>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="kb-card" style="border-left:2px solid #f59e0b">
+        <div class="kb-card-title">PM-006: Feature Flags</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-en4-qa')">Engineer-4</span>
+          <span class="kb-card-tag" style="background:#a78bfa22;color:#a78bfa">QA loop 2</span>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="kb-card">
+        <div class="kb-card-title">CL-001: Go Migration</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('dl-en5')">Engineer-5</span>
+          <span class="kb-card-tag" style="background:#1f6feb22;color:#58a6ff">iter 2 · 8/10</span>
+          <span>Claims</span>
+        </div>
+      </div>
+      <div class="kb-card">
+        <div class="kb-card-title">CL-002: Go API Handlers</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('dl-en6')">Engineer-6</span>
+          <span class="kb-card-tag" style="background:#1f6feb22;color:#58a6ff">iter 1 · 6/10</span>
+          <span>Claims</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- COMPLETE column -->
+  <div class="kb-col kb-comp">
+    <div class="kb-hdr">Complete <span class="kb-cnt">(2)</span></div>
+    <div class="kb-body">
+      <div class="kb-card" style="border-left:2px solid #3fb950">
+        <div class="kb-card-title">PM-001: DB Migration</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-en1')">Engineer-1</span>
+          <span class="kb-card-tag" style="background:#3fb95022;color:#3fb950">10/10 · 2 iter</span>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="kb-card" style="border-left:2px solid #3fb950">
+        <div class="kb-card-title">System Design</div>
+        <div class="kb-card-meta">
+          <span class="kb-card-agent" onclick="flash('nd-arch')">Architect</span>
+          <span class="kb-card-tag" style="background:#3fb95022;color:#3fb950">10/10</span>
+          <span>Payments</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /pv-kanban -->
+
+<!-- ====== TO-DO VIEW (folder structure, addable) ====== -->
+<div class="pv-view" id="pv-todo">
+
+<div class="fv-hdr" onclick="togFV('fv-td-pay',this)">
+  <span class="fv-arrow">▼</span><span class="fv-ic">📦</span><span class="fv-name">Payments Dashboard</span><span class="fv-count">1 to-do</span>
+</div>
+<div class="fv-body" id="fv-td-pay">
+  <div class="fv-hdr" onclick="togFV('fv-td-pay-crud',this)">
+    <span class="fv-arrow">▼</span><span class="fv-ic">📁</span><span class="fv-name">Payment Methods CRUD</span><span class="fv-count">epic</span>
+  </div>
+  <div class="fv-body" id="fv-td-pay-crud">
+    <div class="fv-hdr" onclick="togFV('fv-td-pay-s3',this)">
+      <span class="fv-arrow">▼</span><span class="fv-ic">🔄</span><span class="fv-name">Sprint 3</span>
+    </div>
+    <div class="fv-body" id="fv-td-pay-s3">
+      <div class="fv-item"><span style="color:#f85149">○</span> PM-003: Permission gates <span class="fv-status" style="background:#f8514922;color:#f85149">Blocked</span><span class="p-edit" style="opacity:1;margin-left:4px" onclick="oEdit('PM-003','Permission gates + audit logging')">✏️</span></div>
+      <div class="fv-add" onclick="oAddTicket('Payments Dashboard')">+ Add ticket (PM adds)</div>
+    </div>
+  </div>
+</div>
+
+<div class="fv-hdr" onclick="togFV('fv-td-cl',this)">
+  <span class="fv-arrow">▼</span><span class="fv-ic">📦</span><span class="fv-name">Claims Portal</span><span class="fv-count">2 backlog</span>
+</div>
+<div class="fv-body" id="fv-td-cl">
+  <div class="fv-hdr" onclick="togFV('fv-td-cl-crud',this)">
+    <span class="fv-arrow">▼</span><span class="fv-ic">📁</span><span class="fv-name">ClaimType CRUD</span><span class="fv-count">epic</span>
+  </div>
+  <div class="fv-body" id="fv-td-cl-crud">
+    <div class="fv-hdr" onclick="togFV('fv-td-cl-s1',this)">
+      <span class="fv-arrow">▼</span><span class="fv-ic">🔄</span><span class="fv-name">Sprint 1 — Backlog</span>
+    </div>
+    <div class="fv-body" id="fv-td-cl-s1">
+      <div class="fv-item"><span style="color:#8b949e">○</span> CL-003: Frontend components <span class="fv-status" style="background:#6e768122;color:#8b949e">Backlog</span><span class="p-edit" style="opacity:1;margin-left:4px" onclick="oEdit('CL-003','React frontend for claims CRUD')">✏️</span></div>
+      <div class="fv-item"><span style="color:#8b949e">○</span> CL-004: E2E tests <span class="fv-status" style="background:#6e768122;color:#8b949e">Backlog</span><span class="p-edit" style="opacity:1;margin-left:4px" onclick="oEdit('CL-004','End-to-end tests for claims flow')">✏️</span></div>
+      <div class="fv-add" onclick="oAddTicket('Claims Portal')">+ Add ticket (PM adds)</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pv-todo -->
+
+<!-- ====== COMPLETE VIEW (folder structure) ====== -->
+<div class="pv-view" id="pv-complete">
+
+<div class="fv-hdr" onclick="togFV('fv-cp-pay',this)">
+  <span class="fv-arrow">▼</span><span class="fv-ic">📦</span><span class="fv-name">Payments Dashboard</span><span class="fv-count">2 complete</span>
+</div>
+<div class="fv-body" id="fv-cp-pay">
+  <div class="fv-hdr" onclick="togFV('fv-cp-pay-crud',this)">
+    <span class="fv-arrow">▼</span><span class="fv-ic">📁</span><span class="fv-name">Payment Methods CRUD</span><span class="fv-count">epic</span>
+  </div>
+  <div class="fv-body" id="fv-cp-pay-crud">
+    <div class="fv-hdr" onclick="togFV('fv-cp-pay-s3',this)">
+      <span class="fv-arrow">▼</span><span class="fv-ic">🔄</span><span class="fv-name">Sprint 3</span>
+    </div>
+    <div class="fv-body" id="fv-cp-pay-s3">
+      <div class="fv-item"><span style="color:#3fb950">✓</span> PM-001: DB migration <span class="fv-status" style="background:#3fb95022;color:#3fb950">10/10 · 2 iter · Eng-1</span></div>
+      <div class="fv-item"><span style="color:#3fb950">✓</span> System design: API + DB schema <span class="fv-status" style="background:#3fb95022;color:#3fb950">10/10 · Architect</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="fv-hdr collapsed" onclick="togFV('fv-cp-cl',this)">
+  <span class="fv-arrow" style="transform:rotate(-90deg)">▼</span><span class="fv-ic">📦</span><span class="fv-name">Claims Portal</span><span class="fv-count">0 complete</span>
+</div>
+<div class="fv-body hidden" id="fv-cp-cl">
+  <div class="fv-item" style="color:#6e7681;font-style:italic;padding:6px">No completed tasks yet</div>
+</div>
+
+<!-- When a project is fully done it would appear here -->
+<div style="margin-top:12px;padding-top:8px;border-top:1px solid #21262d">
+  <div style="font-size:10px;color:#6e7681;font-style:italic">Fully completed projects will appear here when all tasks reach 10/10.</div>
+</div>
+
+</div><!-- /pv-complete -->
+
+<!-- CHANGELOG (always visible) -->
+<div class="clog">
+  <div class="ph" style="margin-top:2px">Changelog <em>· plan version history</em>
+    <div class="clog-ctrl"><button class="clog-btn" onclick="clScr(-1)">▲</button><button class="clog-btn" onclick="clScr(1)">▼</button></div>
+  </div>
+  <div class="clog-scroll" id="clog-s">
+    <div class="cl"><span class="cl-t">14:20</span><span class="cl-w cl-ag">PM-1</span><span class="cl-x">Created tickets PM-001–PM-006 with deps</span></div>
+    <div class="cl"><span class="cl-t">14:21</span><span class="cl-w cl-ag">PM-1</span><span class="cl-x">Framework: Knex over Prisma (convention match)</span></div>
+    <div class="cl"><span class="cl-t">14:22</span><span class="cl-w cl-ag">PM-2</span><span class="cl-x">Created tickets CL-001–CL-004, gate=10/10 (HIPAA)</span></div>
+    <div class="cl"><span class="cl-t">14:35</span><span class="cl-w cl-ag">Eng-1</span><span class="cl-x">PM-001 → Done (2 iter, 10/10) — sinking to bottom</span></div>
+    <div class="cl"><span class="cl-t">14:36</span><span class="cl-w cl-ag">System</span><span class="cl-x">Architect → Done (10/10) — sinking to bottom</span></div>
+    <div class="cl"><span class="cl-t">14:50</span><span class="cl-w cl-ag">Eng-2</span><span class="cl-x">PM-002 self-eval 9/10, CI pass → handed to QA</span></div>
+    <div class="cl"><span class="cl-t">14:52</span><span class="cl-w cl-ag">Eng-4</span><span class="cl-x">PM-006 self-eval 9/10, CI pass → handed to QA</span></div>
+    <div class="cl"><span class="cl-t">14:55</span><span class="cl-w cl-ag">Eng-3</span><span class="cl-x">Blocked: depends on PM-002 → Repair auto-spawned</span></div>
+    <div class="cl"><span class="cl-t">15:00</span><span class="cl-w cl-ag">QA</span><span class="cl-x">Batch review: 2 issues (PM-002 error handler, PM-006 flag naming)</span></div>
+    <div class="cl"><span class="cl-t">15:01</span><span class="cl-w cl-ag">QA</span><span class="cl-x">Spawned Engineer-2, Engineer-4 as subagents for fixes</span></div>
+    <div class="cl"><span class="cl-t">15:05</span><span class="cl-w cl-h">✎ Human</span><span class="cl-x">Aligned Eng-2: "use ErrorBoundary middleware" — override</span></div>
+    <div class="cl"><span class="cl-t">15:06</span><span class="cl-w cl-ag">Eng-2</span><span class="cl-x">Accepted alignment, switching to ErrorBoundary</span></div>
+    <div class="cl"><span class="cl-t">15:10</span><span class="cl-w cl-ag">Eng-5</span><span class="cl-x">CL-001 iter 1 self-eval 8/10, adding HIPAA audit columns</span></div>
+  </div>
+</div>
+
+</div><!-- /panel-middle -->
+
+<!-- ===================== RIGHT: APP PREVIEW + EDIT ===================== -->
+<div class="pnl pnl-r">
+<div class="ph">App Preview <em>· select element · give feedback</em></div>
+
+<!-- Screen selector -->
+<div class="app-sel">
+  <button class="app-sel-btn on" onclick="swApp(this,'app-payments')">Payments</button>
+  <button class="app-sel-btn" onclick="swApp(this,'app-claims')">Claims Portal</button>
+</div>
+
+<!-- APP PREVIEW: PAYMENTS -->
+<div id="app-payments" class="app-view" style="display:block">
+<div class="app-frame">
+  <div class="app-bar">
+    <div class="app-dot" style="background:#f85149"></div>
+    <div class="app-dot" style="background:#d29922"></div>
+    <div class="app-dot" style="background:#3fb950"></div>
+    <div class="app-url">localhost:3000/dashboard/payments</div>
+  </div>
+  <div class="app-body">
+    <div class="app-title">Payment Methods</div>
+    <div class="app-card selected" onclick="selCard(this,'Visa ending 4242')">
+      <div class="app-card-ic">💳</div>
+      <div class="app-card-info">
+        <div class="app-card-name">Visa ending in 4242</div>
+        <div class="app-card-sub">Default · Expires 12/27</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-card" onclick="selCard(this,'Mastercard ending 8888')">
+      <div class="app-card-ic">💳</div>
+      <div class="app-card-info">
+        <div class="app-card-name">Mastercard ending in 8888</div>
+        <div class="app-card-sub">Expires 03/26</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-card" onclick="selCard(this,'Bank transfer ACH')">
+      <div class="app-card-ic">🏦</div>
+      <div class="app-card-info">
+        <div class="app-card-name">Bank Transfer (ACH)</div>
+        <div class="app-card-sub">Chase ****9012</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-add-btn" onclick="selCard(null,'Add Method button')">+ Add Payment Method</div>
+  </div>
+</div>
+</div>
+
+<!-- APP PREVIEW: CLAIMS -->
+<div id="app-claims" class="app-view" style="display:none">
+<div class="app-frame">
+  <div class="app-bar">
+    <div class="app-dot" style="background:#f85149"></div>
+    <div class="app-dot" style="background:#d29922"></div>
+    <div class="app-dot" style="background:#3fb950"></div>
+    <div class="app-url">localhost:3000/portal/claims</div>
+  </div>
+  <div class="app-body">
+    <div class="app-title">Claims Dashboard</div>
+    <div class="app-card" onclick="selCard(this,'Claim CLM-2847')">
+      <div class="app-card-ic">📋</div>
+      <div class="app-card-info">
+        <div class="app-card-name">CLM-2847 — Office Visit</div>
+        <div class="app-card-sub">Submitted · $245.00 · HIPAA compliant</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-card" onclick="selCard(this,'Claim CLM-2846')">
+      <div class="app-card-ic">📋</div>
+      <div class="app-card-info">
+        <div class="app-card-name">CLM-2846 — Lab Work</div>
+        <div class="app-card-sub">Processing · $1,200.00</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-card" onclick="selCard(this,'Claim CLM-2840')">
+      <div class="app-card-ic">✅</div>
+      <div class="app-card-info">
+        <div class="app-card-name">CLM-2840 — Prescription</div>
+        <div class="app-card-sub">Approved · $89.50 · Paid</div>
+      </div>
+      <div class="app-card-arrow">›</div>
+    </div>
+    <div class="app-add-btn" onclick="selCard(null,'New Claim button')">+ File New Claim</div>
+  </div>
+</div>
+</div>
+
+<!-- Selected element info -->
+<div id="sel-info" style="font-size:10px;color:#58a6ff;margin-bottom:6px;min-height:18px">Selected: Visa ending 4242</div>
+
+<!-- FEEDBACK INPUT -->
+<div class="fb-section">
+  <div class="fb-label">Give Feedback on Selection</div>
+  <textarea class="fb-input" id="fb-text" placeholder="e.g., Add a delete button to each payment card and confirm before removing"></textarea>
+  <button class="fb-submit" onclick="sendFb()">Send → Creates Ticket</button>
+  <div style="clear:both"></div>
+</div>
+
+<!-- FEEDBACK HISTORY -->
+<div class="fb-section">
+  <div class="fb-label">Feedback History</div>
+  <div id="fb-history">
+    <div class="fb-item">
+      <span class="fb-time">14:22</span>
+      <span class="fb-who">Human</span>
+      <span class="fb-text">"Make default badge more prominent with color"</span>
+      <span class="fb-st fb-st-ok">applied</span>
+    </div>
+    <div class="fb-item">
+      <span class="fb-time">14:45</span>
+      <span class="fb-who">Human</span>
+      <span class="fb-text">"Add card expiry warning for cards expiring within 60 days"</span>
+      <span class="fb-st fb-st-pen">in progress</span>
+    </div>
+    <div class="fb-item">
+      <span class="fb-time">15:01</span>
+      <span class="fb-who">Human</span>
+      <span class="fb-text">"Stripe integration needs webhook for failed payments"</span>
+      <span class="fb-st fb-st-pen">queued</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /panel-right -->
+</div><!-- /wrap -->
+
+<!-- ALIGN MODAL -->
+<div class="ov" id="ov-align">
+  <div class="mdl">
+    <h3 id="al-title">Align: agent</h3>
+    <p>Agent decides if this overrides or supplements the ticket. Logged in changelog.</p>
+    <textarea id="al-input" placeholder="e.g., Use ErrorBoundary middleware"></textarea>
+    <div class="mdl-a">
+      <button class="mb" onclick="cAlign()">Cancel</button>
+      <button class="mb pr" onclick="sAlign()">Send Direction</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TICKET MODAL -->
+<div class="ov" id="ov-edit">
+  <div class="mdl edit-mdl">
+    <h3 id="ed-title">Edit Ticket</h3>
+    <p>Changes are logged in changelog and propagated to assigned agent.</p>
+    <textarea id="ed-input"></textarea>
+    <div class="mdl-a">
+      <button class="mb" onclick="cEdit()">Cancel</button>
+      <button class="mb pr" onclick="sEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TICKET MODAL -->
+<div class="ov" id="ov-add">
+  <div class="mdl">
+    <h3 id="add-title">Add Ticket</h3>
+    <p>PM will pick this up and assign to an agent. Logged in changelog.</p>
+    <textarea id="add-input" placeholder="e.g., Add rate limiting to API endpoints"></textarea>
+    <div class="mdl-a">
+      <button class="mb" onclick="cAdd()">Cancel</button>
+      <button class="mb pr" onclick="sAdd()">Add Ticket</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Toggle decision log / context
+function tog(id){document.getElementById(id).classList.toggle('open')}
+function togPlanCtx(id){document.getElementById(id).classList.toggle('open')}
+
+// Toggle PM body
+function togPM(id,el){
+  document.getElementById(id).classList.toggle('hidden');
+  el.classList.toggle('collapsed');
+}
+
+// Toggle agent children
+function togAgent(id,el){
+  const body=document.getElementById(id);
+  if(!body)return;
+  body.classList.toggle('hidden');
+  el.classList.toggle('collapsed');
+}
+
+// Toggle project in plan
+function togProj(id,el){
+  document.getElementById(id).classList.toggle('hidden');
+  el.classList.toggle('collapsed');
+}
+
+// Toggle folder view
+function togFV(id,el){
+  const body=document.getElementById(id);
+  body.classList.toggle('hidden');
+  el.classList.toggle('collapsed');
+  const arrow=el.querySelector('.fv-arrow');
+  if(el.classList.contains('collapsed')){arrow.style.transform='rotate(-90deg)'}else{arrow.style.transform=''}
+}
+
+// Single agent pause
+function togP(btn){
+  event.stopPropagation();
+  const rw=btn.closest('.rw');
+  const bg=rw.querySelector('.bg');
+  if(bg.classList.contains('bg-pau')){
+    bg.className='bg bg-run';bg.innerHTML='<span class="lv"></span>Working';
+    btn.textContent='⏸';btn.classList.remove('bt-res');
+    toast('Agent resumed');
+  }else{
+    bg.className='bg bg-pau';bg.textContent='⏸ Paused';
+    btn.textContent='▶ Resume';btn.classList.add('bt-res');
+    toast('Agent paused — others continue');
+  }
+}
+
+// Cascade pause
+function cascP(nodeId,btn){
+  const nd=document.getElementById(nodeId);
+  const bg=nd.querySelector('.bg');
+  const kids=nd.querySelectorAll('.nd');
+  if(bg.classList.contains('bg-pau')){
+    bg.className='bg bg-run';bg.innerHTML='<span class="lv"></span>Running';
+    btn.textContent='⏸ Pause'+(nodeId==='nd-athena'?' All':'');
+    btn.classList.remove('bt-res');
+    kids.forEach(k=>k.classList.remove('paused-sub'));
+    toast('Resumed '+nodeId.replace('nd-','')+' + all children');
+  }else{
+    bg.className='bg bg-pau';bg.textContent='⏸ Paused';
+    btn.textContent='▶ Resume'+(nodeId==='nd-athena'?' All':'');
+    btn.classList.add('bt-res');
+    kids.forEach(k=>k.classList.add('paused-sub'));
+    toast('Paused '+nodeId.replace('nd-','')+' + '+kids.length+' children');
+  }
+}
+
+// Stop agent
+function stp(btn,name){
+  event.stopPropagation();
+  if(!confirm('Stop '+name+'?\n\nWork NOT saved. Parent takes human input.\nOther agents keep running.'))return;
+  const rw=btn.closest('.rw');
+  rw.style.opacity='.25';
+  const bg=rw.querySelector('.bg');bg.className='bg bg-stp';bg.textContent='⏹ Stopped';
+  rw.querySelector('.btns').innerHTML='';
+  addCL('✎ Human','cl-h','Stopped '+name+' — work discarded, parent awaiting input');
+  toast(name+' stopped. Parent awaiting input.');
+}
+
+// Align
+let alignT='';
+function oAlign(n){event.stopPropagation();alignT=n;document.getElementById('al-title').textContent='Align: '+n;document.getElementById('al-input').value='';document.getElementById('ov-align').classList.add('open');setTimeout(()=>document.getElementById('al-input').focus(),50)}
+function cAlign(){document.getElementById('ov-align').classList.remove('open')}
+function sAlign(){
+  const t=document.getElementById('al-input').value.trim();if(!t)return;cAlign();
+  addCL('✎ Human','cl-h','Aligned '+alignT+': "'+t.substring(0,50)+(t.length>50?'...':'')+'" — agent decides override/supplement');
+  toast('✎ Direction sent to '+alignT);
+}
+
+// Edit ticket
+let editT='';
+function oEdit(ticket,desc){editT=ticket;document.getElementById('ed-title').textContent='Edit: '+ticket;document.getElementById('ed-input').value=desc;document.getElementById('ov-edit').classList.add('open');setTimeout(()=>document.getElementById('ed-input').focus(),50)}
+function cEdit(){document.getElementById('ov-edit').classList.remove('open')}
+function sEdit(){
+  const t=document.getElementById('ed-input').value.trim();if(!t)return;cEdit();
+  addCL('✎ Human','cl-h','Updated '+editT+': "'+t.substring(0,50)+(t.length>50?'...':'')+'"');
+  toast('Ticket '+editT+' updated. Agent will see change next iteration.');
+}
+
+// Add ticket
+let addProj='';
+function oAddTicket(proj){addProj=proj;document.getElementById('add-title').textContent='Add Ticket to '+proj;document.getElementById('add-input').value='';document.getElementById('ov-add').classList.add('open');setTimeout(()=>document.getElementById('add-input').focus(),50)}
+function cAdd(){document.getElementById('ov-add').classList.remove('open')}
+function sAdd(){
+  const t=document.getElementById('add-input').value.trim();if(!t)return;cAdd();
+  addCL('✎ Human','cl-h','Added ticket to '+addProj+': "'+t.substring(0,50)+(t.length>50?'...':'')+'" — PM will assign');
+  toast('Ticket added to '+addProj+'. PM will pick up.');
+}
+
+// Flash/scroll
+function flash(id){
+  const el=document.getElementById(id);if(!el)return;
+  const pBody=el.closest('.pm-body');
+  if(pBody&&pBody.classList.contains('hidden')){pBody.classList.remove('hidden');const t=pBody.previousElementSibling;if(t)t.classList.remove('collapsed')}
+  const agKids=el.closest('.agent-kids');
+  if(agKids&&agKids.classList.contains('hidden')){agKids.classList.remove('hidden');const t=agKids.previousElementSibling;if(t)t.classList.remove('collapsed')}
+  if(!el.classList.contains('open'))el.classList.add('open');
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.style.outline='2px solid #58a6ff';
+  setTimeout(()=>el.style.outline='',1500);
+}
+
+// Changelog
+function addCL(who,cls,text){
+  const s=document.getElementById('clog-s');
+  const d=document.createElement('div');d.className='cl';
+  const now=new Date();
+  d.innerHTML='<span class="cl-t">'+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'</span><span class="cl-w '+cls+'">'+who+'</span><span class="cl-x">'+text+'</span>';
+  s.appendChild(d);s.scrollTop=s.scrollHeight;
+}
+function clScr(dir){const s=document.getElementById('clog-s');s.scrollTop+=dir*60}
+
+// Plan view tab switch
+function swPV(el,id){
+  document.querySelectorAll('.pv-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pv-view').forEach(v=>v.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+
+// Athena tab switch
+function swTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');if(!el.textContent.includes('Build'))toast(el.textContent+' — coming post-MVP')}
+
+// Toast
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// Escape closes modals
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){cAlign();cEdit();cAdd()}});
+
+// App preview: select card
+function selCard(el,name){
+  document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('selected'));
+  if(el)el.classList.add('selected');
+  document.getElementById('sel-info').textContent='Selected: '+name;
+}
+// App preview: switch screen
+function swApp(btn,id){
+  document.querySelectorAll('.app-sel-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.app-view').forEach(v=>v.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+// Send feedback
+function sendFb(){
+  const t=document.getElementById('fb-text').value.trim();
+  if(!t)return;
+  const sel=document.getElementById('sel-info').textContent;
+  const now=new Date();const time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const h=document.getElementById('fb-history');
+  const d=document.createElement('div');d.className='fb-item';
+  d.innerHTML='<span class="fb-time">'+time+'</span><span class="fb-who">Human</span><span class="fb-text">"'+t.substring(0,80)+(t.length>80?'...':'')+'"</span><span class="fb-st fb-st-pen">queued</span>';
+  h.appendChild(d);
+  document.getElementById('fb-text').value='';
+  addCL('✎ Human','cl-h','Feedback on '+sel+': "'+t.substring(0,50)+(t.length>50?'...':'')+'" → ticket created');
+  toast('Feedback sent → PM creates ticket for: '+sel);
+}
+
+// Simulate done-agent fade: after 10s remove
+setTimeout(()=>{
+  document.querySelectorAll('.done-fading').forEach(el=>{
+    el.style.transition='all .8s';el.style.opacity='0';el.style.height='0';el.style.overflow='hidden';
+    setTimeout(()=>el.remove(),900);
+  });
+},10000);
+</script>
+</body>
+</html>
