@@ -1,0 +1,23 @@
+site: https://southfloridaqigong.com/
+updated: 2026-02-04
+allow: /
+sitemap: https://southfloridaqigong.com/sitemap.xml
+canonical_pages:
+  - https://southfloridaqigong.com/
+  - https://southfloridaqigong.com/ru/
+  - https://southfloridaqigong.com/es/
+languages:
+  - en
+  - ru
+  - es
+business:
+  name: South Florida Qigong
+  practitioner: Aleksandr Popov
+  address: 1117 E Hallandale Beach Blvd Suite 3, Hallandale Beach, FL 33009
+  phone_whatsapp: +1-954-899-9102
+  hours: 08:00-20:00 daily
+services:
+  - Chi Gong Massage
+  - Tea Ceremony
+  - Healing Teas
+  - Fire Massage

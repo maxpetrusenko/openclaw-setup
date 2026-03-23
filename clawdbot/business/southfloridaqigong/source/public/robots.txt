@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://southfloridaqigong.com/sitemap.xml
+
+# AI guidance files
+# https://southfloridaqigong.com/llm.txt
+# https://southfloridaqigong.com/llms.txt
+# https://southfloridaqigong.com/ai.txt
