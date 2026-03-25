@@ -1,0 +1,245 @@
+# Instincts generated from https://github.com/maxpetrusenko/openclaw-setup
+# Generated: 2026-03-22T19:26:22.816Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: openclaw-setup-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, docs, chore
+
+## Evidence
+
+- 22 commits analyzed
+- Detected conventional commit pattern
+- Examples: fix: update test for rsync-based stage clone, feat: add staging teardown workflow
+
+---
+id: openclaw-setup-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Commit Length
+
+## Action
+
+Keep commit messages concise (~40 characters)
+
+## Evidence
+
+- Average commit message length: 40 chars
+- Based on 22 commits
+
+---
+id: openclaw-setup-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Naming Files
+
+## Action
+
+Use PascalCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: PascalCase
+
+---
+id: openclaw-setup-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: openclaw-setup-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: openclaw-setup-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: openclaw-setup-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~19x per month
+- Files: api/*, **/*.test.*, **/api/**
+
+---
+id: openclaw-setup-workflow-add-or-update-serverless-api-endpoint
+trigger: "when doing add or update serverless api endpoint"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Workflow Add Or Update Serverless Api Endpoint
+
+## Action
+
+Follow the add-or-update-serverless-api-endpoint workflow:
+1. Edit or create the endpoint implementation file (e.g., api/waitlist.ts).
+2. Update or create related documentation (e.g., api/CLAUDE.md).
+3. Update configuration or ignore files if needed (e.g., .gitignore).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: api/waitlist.ts, api/CLAUDE.md, .gitignore
+
+---
+id: openclaw-setup-workflow-add-or-update-ops-script-with-tdd
+trigger: "when doing add or update ops script with tdd"
+confidence: 0.75
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Workflow Add Or Update Ops Script With Tdd
+
+## Action
+
+Follow the add-or-update-ops-script-with-tdd workflow:
+1. Create or update an ops script in ops/ (e.g., ops/oc-stage-up.sh, ops/oc-snapshot.sh).
+2. Create or update a corresponding test script in tests/ (e.g., tests/oc-stage-up.test.sh, tests/oc-snapshot.test.sh).
+3. Optionally update shared libraries (e.g., ops/lib/openclaw-host.sh) if needed.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~5x per month
+- Files: ops/*.sh, tests/*.test.sh, ops/lib/openclaw-host.sh
+
+---
+id: openclaw-setup-workflow-update-documentation-and-tests-together
+trigger: "when doing update documentation and tests together"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Workflow Update Documentation And Tests Together
+
+## Action
+
+Follow the update-documentation-and-tests-together workflow:
+1. Edit or create documentation files in docs/ (e.g., docs/quickstart.md, docs/vps-migration.md).
+2. Edit or create related test scripts in tests/ (e.g., tests/oc-reporting-workspace.test.sh).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: docs/*.md, tests/*.test.sh
+
+---
+id: openclaw-setup-workflow-fix-or-improve-api-integration
+trigger: "when doing fix or improve api integration"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maxpetrusenko/openclaw-setup
+---
+
+# Openclaw Setup Workflow Fix Or Improve Api Integration
+
+## Action
+
+Follow the fix-or-improve-api-integration workflow:
+1. Edit the API implementation file (e.g., api/waitlist.ts).
+2. Edit the related documentation (e.g., api/CLAUDE.md).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: api/waitlist.ts, api/CLAUDE.md
+
